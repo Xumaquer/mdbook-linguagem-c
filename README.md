@@ -5,7 +5,7 @@ O foco deste guia é ser uma referência rápida sobre a linguagem, servindo com
 
 
 ## Build
-Para realizar a build do manual, utiliza-se o [mdbook](https://github.com/rust-lang/mdBook).
+Para realizar a build do manual para HTML, utiliza-se o [mdbook](https://github.com/rust-lang/mdBook).
 
 O processo é muito simples, basta abrir a pasta do projeto e rodar o comando de `build` dele : 
 ```bash

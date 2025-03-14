@@ -3,8 +3,6 @@ Os operadores são simbolos utilizados para operar com valores e variaveis.
 
 Os usos dos operadores são diversos e os mesmos são separados em diferentes categorias.
 
-Alguns destes operadores são mais complexos e envolvem conceitos que serão explicados em mais detalhes a frente, portanto caso houver algo que não fique inicialmente claro, aconselho ignorar e continuar lendo, e retornar ao tópico assim que obter o conhecimento necessário para compreender melhor o assunto.
-
 ## Operadores de Atribuição
 O principal operador de atribuição é o `=`, ele funciona de forma bastante simples : 
 ```c
@@ -441,8 +439,8 @@ Os itens mais no topo da tabela a seguir, são os itens de maior prioridade (ord
 | `?:`              | Condição ternária                                |        <        |
 | `=`               | Atribuição                                       |        <        |
 | `+=`/`-=`         | Soma/subtração e atribuição                      |        <        |
-| `*=`/`/=`/`%=`    | Soma/subtração e atribuição                      |        <        |
-| `<<=`/`>>=`       | Soma/subtração e atribuição                      |        <        |
+| `*=`/`/=`/`%=`    | Multiplicação/divisão/resto e atribuição         |        <        |
+| `<<=`/`>>=`       | Deslocamento de bit e atribuição                 |        <        |
 | `&=`/`^=`/`⏐=`    | AND/XOR/OR bit a bit e atribuição                |        <        |
 | `,`               | Operador virgula                                 |        >        |
 
