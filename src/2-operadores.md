@@ -295,7 +295,7 @@ Exemplos:
     valor = condicao1 ? a : 
             condicao2 ? b : 
             condicao3 ? c 
-                      : d;
+            /* else */: d;
     
     //Tem o mesmo comportamento de : 
     if(condicao1) { 
