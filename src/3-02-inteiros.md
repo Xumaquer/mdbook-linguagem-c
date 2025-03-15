@@ -37,6 +37,7 @@ Isso permitiria por exemplo bizarrices como arquiteturas que tem um byte com 64b
 Mas mesmo assim, a maioria das pessoas não está preocupada com arquiteturas obscuras que provavelmente nunca vão ver na vida, na prática as arquiteturas modernas e mesmo sistemas embarcados de hoje em dia em sua grande maioria usam 8bits por byte e a representação de complemento de dois para inteiros com sinal.
 
 ## Limites de inteiros
+Constantes relacionadas a limites de inteiros podem ser encontradas na biblioteca `limits.h`.
 
 Ao assumir complemento de dois para os inteiros com sinal, podemos definir os seguintes limites para os dados : 
 
