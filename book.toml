@@ -4,3 +4,6 @@ language = "pt-br"
 multilingual = false
 src = "src"
 title = "Linguagem C"
+
+[output.html]
+mathjax-support = true

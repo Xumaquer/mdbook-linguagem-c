@@ -169,7 +169,9 @@ Usada como modificador para declarar variáveis de tipos inteiros com sinal (ou 
 
 Inteiros sem sinal tem certas vantagens em relação aos tipos com sinal, no geral por não incluir valores negativos, os tipos sem sinal geralmente conseguem guardar valores até duas vezes maiores do que o valor máximo de uma variável com sinal de tamanho equivalente.
 
-No geral os tipos sem sinal garantem um comportamento circular em caso de overflow (ultrapassar o limite da variavel), onde elas "dão a volta" e retornam ao valor 0, além disso o comportamento para deslocamento é sempre definido, enquanto que para valores com sinal, deslocar para esquerda os bits de um valor negativo é indefinido.
+No geral os tipos sem sinal garantem um comportamento circular em caso de overflow (ultrapassar o limite da variavel), onde elas "dão a volta" e retornam ao valor 0, da mesma forma que subtrair 1 de 0, faz com que um número sem sinal chegue ao seu valor máximo (este caso é geralmente chamado de "underflow" e é um dos principais motivos para evitar números sem sinal).
+
+Além disso o comportamento para deslocamento é sempre definido, enquanto que para valores com sinal, deslocar para esquerda os bits de um valor negativo é indefinido.
 
 ```c
 signed char a;   //char com sinal (geralmente -128 a 127)
@@ -185,8 +187,14 @@ unsigned long long f; //long long sem sinal
 //Valor máximo de um "unsigned char"
 unsigned char teste = UCHAR_MAX;
 
-//Nesse caso, da overflow e resulta em 0 (isso é garantido pela linguagem)
+//Neste caso, da overflow e resulta em 0 (isso é garantido pela linguagem)
 teste = teste + 1;
+
+//Valor mínimo de um "unsigned char"
+unsigned char teste2 = 0;
+
+//Neste caso, ocorre um underflow e o valor resulta em UCHAR_MAX
+teste2 -= 1;
 ```
 
 ## Modificadores de armazenamento
@@ -210,7 +218,7 @@ Dito isso, os tipos de vinculação existentes são :
 Os modificadores existentes são : 
 | Modificador    | Descrição                                                   |
 | -------------- | ----------------------------------------------------------- | 
-| `auto`         | Duração `estática` e `sem vinculação`                       | 
+| `auto`         | Duração `automática` e `sem vinculação`                     | 
 | `register`     | Dica para que o compilador guarde a variavel em registrador |
 | `static`       | Duração `estática` e vinculação `interna`                   |               
 | `extern`       | Duração `estática` e vinculação `externa`                   |  
@@ -228,6 +236,8 @@ O modificador `auto` é considerado inútil, pois só pode ser aplicado a variav
 ### register
 
 O modificador `register` é utilizado para indicar que uma variavel deve ser diretamente guardada apenas em registrador, isto é, nas "mãos" do processador, utilizadas para operar com valores, e portanto, o endereço da variável não pode ser acessado.
+
+`register` implica duração `automática` e `sem vinculação` assim como a palavra chave `auto`.
 
 Antigamente o modificador `register` era útil, ajudando nas otimizações ao fornecer dicas ao compilador, mas hoje em dia, com o compiladores super inteligentes, eles acabam tendo muito mais informação do que nós sobre uma variedade de parâmetros ao decidir sobre otimizações.
 

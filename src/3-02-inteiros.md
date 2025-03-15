@@ -1,0 +1,123 @@
+# Inteiros
+Números inteiros são um conjunto de tipos de variaveis primitivas, indicam números sem casas decimais que podem ter valores negativos e positivos, ou limitados para apenas números positivos com o modificador `unsigned`.
+
+Existem vários tipos de números inteiros, sendo eles (em ordem crescente) : 
+- `char` 
+- `short` 
+- `int` 
+- `long` 
+- `long long (adicionado no C99)` 
+
+## Regras para tamanho de inteiros
+
+No geral o padrão do C não dá muitas garantias quanto aos tamanhos em bytes de inteiros, a única garantia real é que `char` é 1 byte e que os tipos "maiores" precisam atender a alguns requisitos mínimos.
+
+Na prática a maioria dos sistemas modernos atende aos padrões conhecidos como "modelos de dados" que são os conjuntos de tamanhos de cada variavel : 
+- `LP32`: Utilizado pelo windows 16bits (não é mais tão moderno assim...)
+- `ILP32`: Utilizado pelo windows 32bits e sistemas UNIX 32bits (Linux,MacOs e afins)
+- `LLP64`: Utilizado pelo windows 64bits
+- `LP64`: Utilizado por sistemas UNIX 64bits (Linux, MacOs e afins)
+
+Com isso é possível montar a tabela abaixo (relacionando a quantidade de bits de cada tipo) : 
+
+| Tipo        | Padrão C       | LP32 | ILP32 | LLP64 | LP64 |  
+| ----------- | -------------- | :--: | :---: | :---: | :--: |
+| `char`      | Pelo menos 8   |  8   |   8   |   8   |   8  |
+| `short`     | Pelo menos 16  |  16  |   16  |  16   |  16  |
+| `int`       | Pelo menos 16  |  16  |   16  |  32   |  32  |
+| `long`      | Pelo menos 32  |  32  |   32  |  32   |  64  |
+| `long long` | Pelo menos 64  |  64  |   64  |  64   |  64  |
+
+Se atendo um pouco mais aos detalhes, o padrão do C não obriga 1 byte a ser 8bits, na verdade um byte é o menor valor endereçável da arquitetura, portanto apesar de todas as arquiteturas modernas usarem 8bits por byte, o padrão do C aceita arquiteturas que não seguem isso e expõe a definição `CHAR_BIT` que indica o número de bits em um byte.
+
+Isso permitiria por exemplo bizarrices como arquiteturas que tem um byte com 64bits, o que possibilitaria que todos os tipos tivessem apenas 1 byte, logo, quanto a bytes a regra a ser seguida pelo C é a seguinte : 
+
+`1` == `sizeof(char)` <= `sizeof(short)` <= `sizeof(int)` <= `sizeof(long)` <= `sizeof(long long)`
+
+Mas mesmo assim, a maioria das pessoas não está preocupada com arquiteturas obscuras que provavelmente nunca vão ver na vida, na prática as arquiteturas modernas e mesmo sistemas embarcados de hoje em dia em sua grande maioria usam 8bits por byte e a representação de complemento de dois para inteiros com sinal.
+
+## Limites de inteiros
+
+Ao assumir complemento de dois para os inteiros com sinal, podemos definir os seguintes limites para os dados : 
+
+| Tamanho em bits | Tem sinal | Limite inferior      | Limite superior      |
+| :-------------: | :-------: | :------------------: | :------------------: |
+|        8        |    Sim    | -128                 | 127                  |
+|       16        |    Sim    | -32768               | 32768                |
+|       32        |    Sim    | -2147483648          | 2147483647           |
+|       64        |    Sim    | -9223372036854775808 | 9223372036854775807  |
+|        8        |    Não    | 0                    | 255                  |
+|       16        |    Não    | 0                    | 65535                |
+|       32        |    Não    | 0                    | 4294967295           |
+|       64        |    Não    | 0                    | 18446744073709551616 |
+
+Mas e se eu te disser que você não precisa perder seu tempo decorando a tabela acima? 
+
+Todos esses valores podem ser facilmente calculados.
+
+Para inteiros sem sinal o limite é : 
+
+\\[-\frac{2^N}{2} \text{ até } \frac{2^N}{2}-1\\]
+
+Enquanto que para inteiros sem sinal, o limite é 
+
+\\[0 \text{ até } 2^N-1\\]
+
+Onde `N` é o número de bits, logo fica fácil "descobrir" os limites de um tipo inteiro tendo uma calculadora a disposição.
+
+## Tipos de tamanho específico 
+Para facilitar o manuseio de inteiros, existem algumas definições específicas de tipos que estão presentes na biblioteca padrão pela `inttypes.h` que foi adicionada no `C99`.
+
+Lá existem definições para inteiros de 8,16,32 e 64bits e suas respectivas versões com ou sem sinal. Utilizar estes tipos garante um tamanho fixo conhecido e facilita o manuseio dos mesmos além de compatibilidade maior com outros compiladores e processadores.
+
+Eu poderia listar todos eles, mas é mais fácil entender a regra dos nomes, considere que pedaços em colchetes `[]`, são opcionais e `/` são alternativas ao mesmo valor. 
+
+`[u]int[fast/least]X_t`
+
+- `X` é o número de bits, podendo ser 8, 16, 32 ou 64
+- `u` é o modificador para uma versão sem sinal do tipo
+- `fast` é o modificador para obter o tipo "mais eficiente para manuseio" que tenha pelo menos o tamanho especificado
+- `least` é o modificador para obter o menor tipo que tenha "pelo menos aquele tamanho"
+- Na ausência de `fast` e `least`, o tipo tem EXATAMENTE a quantidade de bits em `X`. 
+
+Exemplos : 
+- `uint8_t` : Tipo sem sinal com exatamente 8bits
+- `int_fast32_t`: Tipo com sinal com o tipo mais eficiente que tenha pelo menos 32bits
+- `uint_least64_t`: Inteiro sem sinal com pelo menos 64bits
+
+Além destes tipos, existe o `intmax_t` que contêm o maior tipo inteiro com sinal  e `uintmax_t` que contêm o maior tipo inteiro sem sinal.
+
+## Tipos inteiros adicionais
+Além destes, existem alguns tipos inteiros adicionais presentes nas bibliotecas `inttypes.h` e `stddef.h` (incluida junto com `stdlib.h`).
+
+Estes tipos sã  o : 
+| Tipo          | Descrição                                                            |
+| ------------- | -------------------------------------------------------------------- |
+| `ptrdiff_t`   | Tipo resultante ao subtrair dois ponteiros                           | 
+| `size_t`      | Tipo que pode guardar o tamanho máximo teórico que um array pode ter |
+| `max_align_t` | Tipo que com o maior requisito de alinhamento possível (`C11`)       |
+| `intptr_t`    | Inteiro com sinal capaz de guardar qualquer ponteiro                 |
+| `uintptr_t`   | Inteiro sem sinal capaz de guardar qualquer ponteiro                 |
+
+O tipo `size_t` é o tipo resultante de toda expressão `sizeof`, e é o tipo ideal para guardar o tamanho máximo que objetos, arrays ou qualquer dado possa ter.
+
+O tipo `ptrdiff_t` é utilizado para guardar diferenças entre ponteiros, e pode ser considerado como uma versão com sinal de `size_t`, visto que o tipo `ssize_t` normalmente definido e presente em sistemas POSIX não faz parte do padrão do C.
+
+O propósito do POSIX ao utilizar `ssize_t` é a possibilidade de utilizar os valores negativos para indicar erros, reservando um bit do valor para erros.
+
+`max_align_t` no geral é utilizado junto com o operador `alignof`.
+
+## Dicas para uso consciente de inteiros
+No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem um `int` de pelo menos 32bits).
+
+Em casos onde operações com bits ou tamanhos fixos são necessários, os tipos `uintx_t` e `intx_t` são utilizados para especificar um tamanho fixo.
+
+O tipo `size_t` é importante também pois é normalmente utilizado para indicar tamanhos ou um inteiro do maior tamanho suportado nativamente pela plataforma.
+
+Já o tipo `ptrdiff_t` é mais raro, mas pode ser usado de maneira similar ao `ssize_t` definido pelo POSIX (um tamanho de arrays/dados que também pode representar erros, utilizado geralmente em retorno de funções) ou realmente para diferenças entre ponteiros.
+
+
+
+
+
+
