@@ -90,7 +90,7 @@ Além destes tipos, existe o `intmax_t` que contêm o maior tipo inteiro com sin
 ## Tipos inteiros adicionais
 Além destes, existem alguns tipos inteiros adicionais presentes nas bibliotecas `inttypes.h` e `stddef.h` (incluida junto com `stdlib.h`).
 
-Estes tipos sã  o : 
+Estes tipos são : 
 | Tipo          | Descrição                                                            |
 | ------------- | -------------------------------------------------------------------- |
 | `ptrdiff_t`   | Tipo resultante ao subtrair dois ponteiros                           | 
@@ -107,8 +107,18 @@ O propósito do POSIX ao utilizar `ssize_t` é a possibilidade de utilizar os va
 
 `max_align_t` no geral é utilizado junto com o operador `alignof`.
 
+## Tipo _BigInt
+Adicionado apenas no `C23`, o tipo é declarado como `_BigInt(N)` onde `N` é o número de bits que o tipo deve ter com cada valor de `N` sendo considerado um tipo diferente.
+
+Os tipos `_BigInt` ainda podem ter o modificador `unsigned` e para valores com sinal, o número de `N` inclui o bit de sinal, de forma que `_BigInt(1)` não seja um tipo válido (pois não sobra nenhum bit pro valor).
+
+A mesma regra descrita nos [limites de inteiros](#limites-de-inteiros) se aplicam para calcular os limites de um valor do tipo `_BigInt`.
+
+## Inteiros definidos pela implementação
+Desde o `C99`, existe a possibilidade dos compiladores terem tipos inteiros adicionais adicionados a linguagem, tipos como `__uint128` e `__int128` que simbolizam inteiros de 128 bits, porém o suporte e existência desses tipos depende da arquitetura e do compilador utilizado.
+
 ## Dicas para uso consciente de inteiros
-No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem um `int` de pelo menos 32bits).
+No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem geralmente um `int` de pelo menos 32bits, a menos que sejam processadores embarcados).
 
 Em casos onde operações com bits ou tamanhos fixos são necessários, os tipos `uintx_t` e `intx_t` são utilizados para especificar um tamanho fixo.
 
