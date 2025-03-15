@@ -55,7 +55,7 @@ O `binary64 extendido` e o `binary128` tem a mesma quantidade de bits reservadas
     - Maior inteiro :  \\(2^{113} - 1\\)
 
 ## Entendendo os limites
-Mas agora a pergunta que não quer calar é... como os ponto flutuantes conseguem ter uma faixa tão grande de valores, mesmo tendo uma quantidade de bits similar?
+Mas agora a pergunta que não quer calar é... como os ponto flutuantes conseguem ter uma faixa tão grande de valores, mesmo tendo uma quantidade de bits similar a inteiros que representam faixas bem menores?
 
 Assumindo o padrão dos formatos do IEEE 754, a verdade é que eles guardam bits separados para sinal, expoente e número, de forma que alguns valores não possam exatamente serem representados com precisão.
 
