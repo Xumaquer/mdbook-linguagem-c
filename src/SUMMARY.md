@@ -7,6 +7,7 @@
   - [Inteiros](./3-02-inteiros.md)
   - [Booleanos](./3-03-booleanos.md)
   - [Ponto Flutuante](./3-04-ponto-flutuante.md)
-
+- [Controle de Fluxo](./4-controle-de-fluxo.md)
+- [Laços de Repetição](./5-lacos-de-repeticao.md)
 
 - [Apêndice](./x-00-apendice.md)
