@@ -92,6 +92,7 @@ Além destes tipos, existe o `intmax_t` que contêm o maior tipo inteiro com sin
 Além destes, existem alguns tipos inteiros adicionais presentes nas bibliotecas `inttypes.h` e `stddef.h` (incluida junto com `stdlib.h`).
 
 Estes tipos são : 
+
 | Tipo          | Descrição                                                            |
 | ------------- | -------------------------------------------------------------------- |
 | `ptrdiff_t`   | Tipo resultante ao subtrair dois ponteiros                           | 
