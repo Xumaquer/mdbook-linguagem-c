@@ -216,6 +216,7 @@ Dito isso, os tipos de vinculação existentes são :
 - `Externa`: A variável pode ser referida por qualquer unidade de tradução, ou seja, pode ser referida por outros arquivos.
 
 Os modificadores existentes são : 
+
 | Modificador    | Descrição                                                   |
 | -------------- | ----------------------------------------------------------- | 
 | `auto`         | Duração `automática` e `sem vinculação`                     | 
