@@ -153,10 +153,10 @@ echo $?
 
 Também é importante lembrar que desde o `C99`, não é necessário escrever `return` na função `main`, pois a ausência de `return` indica que o valor retornado será `0` (só se aplica ao `main`).
 
-## Definições de funções
-Se uma função é declarada no C, ela geralmente deve ser declarada antes da função que a utiliza, sem isso, compilar o programa resulta em um erro de compilação.
+## Declaração de funções
+Se uma função é definida no C, ela geralmente deve ser definida antes da função que a utiliza, sem isso, compilar o programa resulta em um erro de compilação.
 
-Porém, existe uma forma de burlar isso, definindo a função sem declarar.
+Porém, existe uma forma de burlar isso, declarando a função sem definir ou implementar ela.
 
 Exemplo : 
 ```c
@@ -175,11 +175,11 @@ int soma(int v1, int v2)
 }
 ```
 
-Quando definimos uma função, estamos especificando como a função deve ser chamada e quais parâmetros ela deve receber, logo toda informação relevante para chamar a função está presente.
+Quando declaramos uma função, estamos especificando como a função deve ser chamada e quais parâmetros ela deve receber, logo toda informação relevante para chamar a função está presente.
 
-Mas a explicação real do que realmente acontece quando definimos uma função é um pouco mais complexa.
+Mas a explicação real do que realmente acontece quando declaramos uma função é um pouco mais complexa.
 
-Ao definir uma função, estamos basicamente dizendo ao compilador "confia em mim, essa função claramente existe", o compilador, por sua vez, decide acreditar em você até os últimos momentos.
+Ao declarar uma função, estamos basicamente dizendo ao compilador "confia em mim, essa função claramente existe", o compilador, por sua vez, decide acreditar em você até os últimos momentos.
 
 Mesmo se a função não existir, a etapa de compilação que compila o código de uma unidade de tradução ainda vai funcionar, e seu código é compilado indicando que ele tem uma dependência em uma função com aquele nome.
 
