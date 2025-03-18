@@ -65,8 +65,5 @@ Para resolver este problema o `C99` definiu o tipo `_Bool` e a biblioteca `stdbo
 
 O tipo `_Bool` pode receber qualquer valor, porém ao guardar o valor, ele é automáticamente convertido para `0` ou `1` seguindo a regra de leitura de valores booleanos, permitindo comparações como `valor == true` sejam verdadeiras mesmo que o valor tenha sido obtido ao executar `valor = 5`.
 
-O ideal é sempre acessar o tipo utilizando o `stdbool.h` e as macros de `true` e `false`, visto que no `C23`, `bool` se tornou um tipo único da linguagem, enquanto `true` e `false` se tornaram palavras chaves nativas da linguagem.
-
-
-
+O ideal é sempre acessar o tipo utilizando o `stdbool.h` e as macros de `true` e `false` definidas nele, visto que no `C23`, `bool` se tornou um tipo único da linguagem, enquanto `true` e `false` se tornaram palavras chaves nativas da linguagem.
 
