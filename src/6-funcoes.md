@@ -210,3 +210,163 @@ int main()
 No exemplo acima, o código no `arquivo2.c` importa a função presente no `arquivo1.c` e a chama, se compilarmos apenas `arquivo1.c` teremos um código que carece da função `main` e se compilarmos apenas `arquivo2.c` teremos um erro de `undefined reference`.
 
 De forma que esse código só funcione se ambos forem compilados juntos.
+
+## Funções variádicas
+Funções variádicas são funções que tem a capacidade de receber um número variável de argumentos.
+
+Para escrever funções variádicas, devemos colocar `...` como o último argumento de uma função, antes do `C23` era necessário ter ao menos um argumento além do `...`, porém no `C23` essa obrigatoriedade foi removida.
+
+Exemplo de função variadica : 
+```c
+    int printf(const char *restrict format, ...);
+```
+
+Para utilizar os argumentos de uma função variádica, é necessário utilizar as macros definidas na biblioteca `stdarg.h` junto do tipo `va_list` que indica a lista de argumento variádicos.
+
+Descrições das macros, bem como dos seus argumentos (que estão descritos entre parenteses):
+
+- `va_start(LISTA,INICIO)`: a macro `va_start` inicializa a variavel `LISTA` do tipo `va_list`
+que aparece logo após o argumento `INICIO`, sendo necessário informar o argumento `INICIO` sempre que houver outro argumento antes dos argumentos variádicos (o que é obrigatório antes do `C23`).
+
+- `va_arg(LISTA,TIPO)`: a macro `va_arg` retorna o próximo valor do tipo informado em `TIPO` da variável `LISTA` do tipo `va_list` que foi inicializada com `va_start`, a ideia é que a cada chamada de `va_arg` um argumento é extraido e a `va_list` "avança de posição".
+
+- `va_copy(DESTINO,FONTE)`: Adicionado no `C99`, copia a variável `FONTE` do tipo `va_list` para a variável `DESTINO` também do tipo `va_list`, sendo necessário chamar `va_end` para cada uma das listas.
+
+- `va_end(LISTA)`: Finaliza a variavel `LISTA` que foi inicializada com `va_start`,  a ideia é que normalmente essa funcionalidade é implementada usando a stack e usar `va_end` limpa a stack utilizada por `LISTA`.
+
+
+Abaixo um exemplo de uma função de argumentos variádicos que calcula uma média aritmética.
+```c
+#include <stdarg.h>
+#include <stdio.h>
+
+double calculaMedia(int quantidade, ...)
+{
+    double soma = 0;
+    va_list argumentos;
+    va_start(argumentos); 
+
+    for(int i = 0; i < quantidade; i++) 
+        soma += va_arg(argumentos, double);
+
+    va_end(argumentos);
+    
+    //Evita divisão por zero ou com números negativos...
+    if(quantidade <= 0)
+        return 0; 
+    
+    return (soma / quantidade);
+}
+
+int main()
+{
+    const int quant = 3;
+    const double prova1 = 5.7;
+    const double prova2 = 8.4;
+    const double prova3 = 9.2;
+
+    double media = calculaMedia(quant, prova1, prova2, prova3);
+
+    printf("A media das notas é %.2f\n", media);
+}
+```
+
+Apesar do `C23` ter removido a obrigatoriedade de outros argumentos, é normal que seja necessário adicionar ao menos um argumento obrigatório, para que seja possível saber quantos argumentos são.
+
+Também é interessante saber que algumas funções do padrão do C como `printf` e `scanf` e suas variações, que normalmente são funções variádicas, também tem outras variações que começam com `v` como `vprintf` e `vscanf` que aceitam um parâmetro do tipo `va_list`.
+
+Isso pode ser utilizado por exemplo, para implementar uma função variádica que faça algum tratamento adicional antes de chamar essas funções, por exemplo : 
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+/*
+    A função "scanf" normalmente é extremamente problemática para 
+    leitura de entrada do usuário no terminal, pois pode manter coisas
+    pendentes no buffer de leitura
+    
+    A própria documentação do manpages aponta isso e relembra a dificuldade 
+    de usar "scanf" corretamente
+    
+    Utilizar "fgets" para leitura e possivelmente depois uma função separada
+    de conversão como "sscanf"/"strtol"/"strtod"/"strtof" é melhor para ler 
+    entrada do usuário, porém é mais complexo 
+    
+    Aqui vamos mostrar como podemos fazer a combinação "fgets" + "sscanf" ficar 
+    transparente de forma que funcione como um "scanf" porém sem o problema de 
+    leitura pendente.
+
+    Vale lembrar, que o "scanf" é capaz de lidar com entradas enormes e as lê 
+    sob demanda, enquanto aqui estou tentando ler a linha inteira de uma vez, 
+    portanto "scanf" é ideal para leituras maiores (acima dos 4KB que defini)
+    enquanto essa função se adequa melhor para leituras simples escritas pelo
+    usuário.
+*/
+int scanf_user(const char *restrict format, ...)
+{
+    char line[4096];
+    if(fgets(line, sizeof(line), stdin) == NULL)
+        return feof(stdin) ? EOF : 0;
+
+    va_list args;
+    va_start(args, format);
+    int result = vsscanf(line, format, args);
+    va_end(args);
+
+    return result;
+}
+
+
+int main()
+{
+    int test1, test2;
+    scanf_user("%d\n", &test1);
+    scanf_user("%d\n", &test2);
+
+    printf("%d e %d\n", test1, test2);
+}
+```
+
+Para testar a diferença prática do código acima, experimente escrever `abacate` na primeira entrada e `10` na segunda, e depois trocar as chamadas de `scanf_user` para `scanf` e testar novamente do mesmo jeito.
+
+## Modificadores
+Ainda existem 2 modificadores utilizados em funções, que fornecem dicas para o compilador, sendo eles `inline` e `_Noreturn`.
+
+### Inline
+O modificador `inline` é utilizado como uma dica para o compilador, indicando que chamar a função, deve idealmente evitar uma chamada "real" da função e apenas inserir as instruções contidas nela diretamente no local onde ela foi chamada.
+
+Em funções com vinculação interna, o modificador `inline` pode ser usado normalmente (`static inline`).
+
+A regra do C é que "se todas as declarações de funções especificam `inline` sem `extern` então a definição naquela unidade de tradução é uma definição `inline`", logo se em algum lugar de uma unidade de tradução escrevermos `extern inline void funcao1();` por exemplo, todas as definições da função `funcao1` mesmo tendo `inline`, não serão tratadas como `inline`. 
+
+Na prática isso significa que o ideal é utilizarmos sempre `static inline` e opcionalmente, podemos fornecer em uma das unidades de traduções compiladas, uma única versão "não inline" da função que tenha o mesmo nome.
+
+#### Motivação por trás do uso de inline
+
+Chamar funções muitas vezes é custoso comparado com algumas instruções mais simples e chamar funções bilhões de vezes pode ter um custo relevante comparado a executar diretamente suas instruções.
+
+Porém, o compilador é livre para ignorar a presença ou ausência desse modificador, fazendo o `inline` de funções que são pequenas e não tem o modificador `inline` ou decidindo mesmo numa função que o tenha que é mais eficiente chamar a função do que gerar cópias enormes de um código que é chamado em vários lugares e é grande.
+
+Os compiladores de hoje em dia são cada vez mais inteligentes, portanto é difícil saber se `inline` realmente fará alguma diferença, a melhor maneira de saber isso é testando, para isso o [Compiler Explorer](https://gcc.godbolt.org/) é uma ótima alternativa que permite visualizar o assembly gerado ao compilar.
+
+### _Noreturn
+O modificador `_Noreturn` pode ser utilizado como `noreturn` ao adicionar a biblioteca `stdnoreturn.h`, no `C23` ele foi depreciado e substituito pelo atributo `[[noreturn]]`.
+
+Este modificador indica que a função não vai retornar sob hipótese alguma, pois provavelmente vai utilizar `exit` ou algum outro mecanismo como `longjmp` que modifique o fluxo de execução impedindo o retorno.
+
+Se existir a remota possibilidade da função retornar, como no caso de funções como o [execve](https://man7.org/linux/man-pages/man2/execve.2.html) do linux, que apesar de não retornar caso bem sucedida, ainda pode falhar, o ideal é não marcar a função como `noreturn`.
+
+Existem dois motivos principais para marcar uma função como `noreturn`, a possibilidade de otimizações adicionais pelo compilador e avisos melhores por parte do compilador, que pode possivelmente indicar quando código é escrito após a chamada de uma função `noreturn` ou mesmo o uso da palavra chave `return` dentro dela.
+
+
+
+
+
+
+
+
+
+
+
