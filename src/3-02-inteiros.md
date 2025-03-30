@@ -1,7 +1,9 @@
 # Inteiros
 Números inteiros são um conjunto de tipos de variaveis primitivas, indicam números sem casas decimais que podem ter valores negativos e positivos, ou limitados para apenas números positivos com o modificador `unsigned`.
 
-Existem vários tipos de números inteiros, sendo eles (em ordem crescente) : 
+A única diferença entre os diferentes tipos de inteiros são as regras para definição do seu tamanho e limites e algumas particularidades exclusivas dos tipos `char`, `signed char` e `unsigned char` que serão explicados em detalhes na seção sobre ponteiros.
+
+Existem vários tipos de números inteiros, sendo eles (em ordem crescente de tamanho) : 
 - `char` 
 - `short` 
 - `int` 
@@ -12,7 +14,7 @@ Existem vários tipos de números inteiros, sendo eles (em ordem crescente) :
 
 No geral o padrão do C não dá muitas garantias quanto aos tamanhos em bytes de inteiros, a única garantia real é que `char` é 1 byte e que os tipos "maiores" precisam atender a alguns requisitos mínimos.
 
-Na prática a maioria dos sistemas modernos atende aos padrões conhecidos como "modelos de dados" que são os conjuntos de tamanhos de cada variavel : 
+Na prática a maioria dos sistemas modernos atende aos padrões conhecidos como "modelos de dados" que são os conjuntos de tamanhos de cada variável : 
 - `LP32`: Utilizado pelo windows 16bits (não é mais tão moderno assim...)
 - `ILP32`: Utilizado pelo windows 32bits e sistemas UNIX 32bits (Linux,MacOs e afins)
 - `LLP64`: Utilizado pelo windows 64bits

@@ -80,9 +80,9 @@ Porém o `for` é separado em 3 campos:
 
 `for(pre-execução; condição; pós-iteração)`
 
-- O campo de pre-execução, que pode ser vazio, inclui um único statement que é executado antes de checar o campo `condição` pela primeira vez, ele também pode conter uma declaração de variavel (que só vai existir dentro do `for`).
+- O campo de pre-execução, que pode ser vazio, inclui um único statement que é executado antes de checar o campo `condição` pela primeira vez, ele também pode conter uma declaração de variável (que só vai existir dentro do `for`).
 - O campo de condição, é similar ao campo de condição de um `while`, porém quando este campo está vazio, considera-se um loop infinito (similar a `while(1)`).
-- O campo da pós-iteração, que pode ser vazio, é um único statement (que não deve ter `;`) que é executado após cada iteração do laço, geralmente utilizado para modificar alguma variavel usada dentro do laço.
+- O campo da pós-iteração, que pode ser vazio, é um único statement (que não deve ter `;`) que é executado após cada iteração do laço, geralmente utilizado para modificar alguma variável usada dentro do laço.
 
 Lembrando que no `for`, os statements não devem ter `;`, e o `;` é meramente o separador entre os campos e deve estar incluso, mesmo se o campo estiver vazio.
 
@@ -96,7 +96,7 @@ Exemplo do laço de repetição `for` usado para escrever todos valores de um ar
 
 int main()
 {
-    //Este é um array, uma variavel que indica uma lista de valores sequenciais
+    //Este é um array, uma variável que indica uma lista de valores sequenciais
     //Vamos falar mais sobre ele mais tarde
     int numeros[5] = {53,37,84,28,39};
 

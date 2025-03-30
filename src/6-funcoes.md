@@ -8,7 +8,7 @@ As principais vantagens ao utilizar funções são :
 - Diminuição de dependências externas
 
 Funções são declaradas utilizando a sintaxe `tipoRetorno NomeFunção(parametros)` : 
-- `tipoRetorno` indica o tipo do valor resultante de uma função, que pode ser atribuido a uma variavel ou usado em outras expressões, podemos escrever `void` para indicar que a função não resulta em um valor.
+- `tipoRetorno` indica o tipo do valor resultante de uma função, que pode ser atribuido a uma variável ou usado em outras expressões, podemos escrever `void` para indicar que a função não resulta em um valor.
 - `NomeFunção` é o nome dado a função, utilizado ao chamar
 - `parametros` são os parâmetros que devem ser repassados ao chamar a função, é uma lista com a definição de zero ou mais variaveis, separadas por virgula.
 
@@ -67,7 +67,7 @@ int main()
 }
 ```
 
-Também é importante mencionar que desde o `C99`, é possível acessar o nome da função atual utilizando `__func__`, que é tratado como uma variável constante e de duração estática (que claramente só será incluida na memória do programa se for utilizada).
+Também é importante mencionar que desde o `C99`, é possível acessar o nome da função atual utilizando a macro `__func__`, que é tratado como uma variável constante e de duração estática (que claramente só será incluida na memória do programa se for utilizada).
 
 ## Ponto de entrada
 Em todas as aplicações feitas em C, exceto as que não usam o ambiente de execução padrão do C, precisam escrever uma função especial denominada `main`.
@@ -125,7 +125,7 @@ Para indicar uma execução bem sucedida, usa-se o valor `0` ou a macro `EXIT_SU
 
 Para indicar um erro ou falha na execução, usa-se um valor diferente de `0`, geralmente positivo ou a macro `EXIT_FAILURE` definida também na `stdlib.h`.
 
-Esses códigos de status podem ser acessados pelo terminal diretamente após executar um programa utilizando a variavel `%errorlevel%` no Windows ou `$?` no bash em linux ou macOs.
+Esses códigos de status podem ser acessados pelo terminal diretamente após executar um programa utilizando a variável `%errorlevel%` no Windows ou `$?` no bash em linux ou macOs.
 
 Podemos fazer um programa que justamente testa isso : 
 ```c
@@ -225,14 +225,14 @@ Para utilizar os argumentos de uma função variádica, é necessário utilizar 
 
 Descrições das macros, bem como dos seus argumentos (que estão descritos entre parenteses):
 
-- `va_start(LISTA,INICIO)`: a macro `va_start` inicializa a variavel `LISTA` do tipo `va_list`
+- `va_start(LISTA,INICIO)`: a macro `va_start` inicializa a variável `LISTA` do tipo `va_list`
 que aparece logo após o argumento `INICIO`, sendo necessário informar o argumento `INICIO` sempre que houver outro argumento antes dos argumentos variádicos (o que é obrigatório antes do `C23`).
 
 - `va_arg(LISTA,TIPO)`: a macro `va_arg` retorna o próximo valor do tipo informado em `TIPO` da variável `LISTA` do tipo `va_list` que foi inicializada com `va_start`, a ideia é que a cada chamada de `va_arg` um argumento é extraido e a `va_list` "avança de posição".
 
 - `va_copy(DESTINO,FONTE)`: Adicionado no `C99`, copia a variável `FONTE` do tipo `va_list` para a variável `DESTINO` também do tipo `va_list`, sendo necessário chamar `va_end` para cada uma das listas.
 
-- `va_end(LISTA)`: Finaliza a variavel `LISTA` que foi inicializada com `va_start`,  a ideia é que normalmente essa funcionalidade é implementada usando a stack e usar `va_end` limpa a stack utilizada por `LISTA`.
+- `va_end(LISTA)`: Finaliza a variável `LISTA` que foi inicializada com `va_start`,  a ideia é que normalmente essa funcionalidade é implementada usando a stack e usar `va_end` limpa a stack utilizada por `LISTA`.
 
 
 Abaixo um exemplo de uma função de argumentos variádicos que calcula uma média aritmética.

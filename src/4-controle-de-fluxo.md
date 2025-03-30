@@ -98,11 +98,11 @@ Exemplo utilizando `if`, `else if` e `else` :
 ```
 
 ## Switch 
-A palavra chave `switch` é utilizada para realizar um controle de fluxo condicional para valores especificos de uma variavel, geralmente utilizado em conjunto com constantes e enumerações.
+A palavra chave `switch` é utilizada para realizar um controle de fluxo condicional para valores especificos de uma variável, geralmente utilizado em conjunto com constantes e enumerações.
 
 Para cada valor que deseja-se checar, utilizamos a palavra chave `case`, escrevendo `case valor:`.
 
-Também podemos escrever `default:` para indicar um código que será executado caso o valor da variavel avaliada não seja nenhum dos `cases` listados, funcionado de maneira similar a palavra chave `else`.
+Também podemos escrever `default:` para indicar um código que será executado caso o valor da variável avaliada não seja nenhum dos `cases` listados, funcionado de maneira similar a palavra chave `else`.
  
 ```c
 switch(valor) {

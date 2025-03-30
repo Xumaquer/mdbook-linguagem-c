@@ -9,11 +9,11 @@ O principal operador de atribuição é o `=`, ele funciona de forma bastante si
 variavel = valor;
 ```  
 
-A variavel (ou local na memória) a esquerda, recebe o valor a direita.
+A variável (ou local na memória) a esquerda, recebe o valor a direita.
 
 No geral os operadores de atribuição, são em sua maioria junções do operador `=` com outros operadores já existentes, portanto vou apenas listar os que existem (aconselho que veja o resto do texto logo a seguir, que explica cada categoria de operadores com mais detalhes)
 
-Para que um valor possa ficar no lado esquerdo de uma atribuição (o lado que recebe), ele deve ao menos indicar um local no qual o valor que está sendo recebido será guardado (seja uma variavel, ou o conteúdo em um endereço de memória).
+Para que um valor possa ficar no lado esquerdo de uma atribuição (o lado que recebe), ele deve ao menos indicar um local no qual o valor que está sendo recebido será guardado (seja uma variável, ou o conteúdo em um endereço de memória).
 
 No geral é comum vermos menções disso nos seguintes termos em inglês: 
 - `lvalue` : Valor que pode sofrer uma atribuição, vem de `Left Value` (valor a esquerda)
@@ -84,7 +84,7 @@ arquivos.
 | `++`     | Incremento       |
 | `--`     | Decremento       |
 
-O operador de incremento, aumenta em 1 o valor de uma variavel, e o operador de decremento, diminuí em 1 o valor de uma variavel, o que é diferente dos operadores de soma e subtração que não modificam a variavel e apenas geram um valor. 
+O operador de incremento, aumenta em 1 o valor de uma variável, e o operador de decremento, diminuí em 1 o valor de uma variável, o que é diferente dos operadores de soma e subtração que não modificam a variável e apenas geram um valor. 
 
 O curioso desses operadores é que, a posição onde são colocados altera o comportamento, portanto `++x` se comporta diferente de `x++`. Essa diferença se da pelo valor resultante da expressão, pois ao utilizarmos o operador como prefixo (`++x` ou `--x`), o valor é modificado primeiro e depois lido, e ao utilizarmos um sufixo (`x++` ou `x--`), o valor é lido e depois modificado.
 
@@ -228,7 +228,7 @@ A linguagem C também apresenta alguns operadores adicionais que não se encaixa
 | `typeof`   | Tipo de (`C23`)                   |
 
 ### Chamada de função 
- Ao chamar uma [função](./6-funcoes.md) , utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variavel guardando o endereço de uma função).
+ Ao chamar uma [função](./6-funcoes.md) , utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variável guardando o endereço de uma função).
 
 ### Operador virgula
 Este operador é utilizado para adicionar uma expressão adicional, ignorando o resultado da expressão anterior, mas ainda levando em consideração os seus efeitos colaterais. Por exemplo ao escrevermos `a,b`, os efeitos colaterais de `a` são aplicados, porém, o resultado da expressão como um todo será o resultado de `b`.
@@ -252,7 +252,7 @@ Este operador é utilizado para converter um tipo para outro, algumas conversõe
 - `Para void`: É possível realizar conversões para o tipo `void` que simboliza uma ausência de tipo/valor, isso é útil por exemplo para ignorar o retorno de algumas funções intencionalmente quando, por exemplo, configuramos o compilador para avisar quando um retorno de função é ignorado.
 - `Inteiros maiores para menores`: Ao converter números inteiros que usam mais bytes para tipos inteiros menores, o valor é truncado, cortando fora os bytes que excedem o tamanho do tipo menor.
 - `Ponteiro para inteiro`: É possível converter ponteiros para tipos inteiros, no geral é aconselhável utilizar o tipo `intptr_t` ou `uintptr_t` que naturalmente tem o mesmo tamanho em bytes e desde o `C99` funcionam de forma garantida se a implementação fornece esses tipos, a conversão de um ponteiro nulo não necessariamente precisa dar 0 ao ser convertida para um inteiro.
-- `Inteiro para ponteiro`: É possível converter números inteiros para ponteiros, porém não há nenhuma garantia que o valor esteja alinhado ou aponte para uma variavel do tipo certo.
+- `Inteiro para ponteiro`: É possível converter números inteiros para ponteiros, porém não há nenhuma garantia que o valor esteja alinhado ou aponte para uma variável do tipo certo.
 - `Ponteiro de valor para ponteiro de valor`: Qualquer ponteiro de valor (que não seja de função) pode ser convertido para um tipo ponteiro de "caractere" (`char`, `signed char`,`unsigned char`) para que seja possível copiar o objeto ou ler sua representação interna em bytes, outras conversões são aceitas mas idealmente devem ter um alinhamento adequado.
 - `Ponteiro de função <-> ponteiro de valor`: Conversões entre esses dois tipos são proibidas, porém, vários compiladores suportam eles como extensões e ao menos no Windows e Linux, eles são necessários para carregar funções de bibliotecas dinâmicas utilizando [`GetProcAddress`](https://learn.microsoft.com/pt-br/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress) e [`dlsym`](https://man7.org/linux/man-pages/man3/dlsym.3.html) respectivamente.
 - `Ponteiros para ponto flutuante`: Conversões entre ponteiros e variaveis de ponto flutuante são proibidas.
@@ -310,11 +310,11 @@ Exemplos:
 ```
 
 ### Operador sizeof
-O operador `sizeof` pode ser usado para obter o tamanho de qualquer tipo, variavel ou valor, diretamente em bytes.
+O operador `sizeof` pode ser usado para obter o tamanho de qualquer tipo, variável ou valor, diretamente em bytes.
 
 No geral mesmo quando um valor é passado ao `sizeof`, o valor não é realmente avaliado e sim o tamanho que o tipo daquele valor teria, portanto expressões que ocasionariam em erros ou crashs no programa ao serem avaliadas, não o causam, pois não são realmente avaliadas. 
 
-Na maioria dos casos, com exceção de arrays de tamanho variavel, o operador `sizeof` é avaliado durante a compilação, portanto seu uso não afeta o tempo de execução (nesses casos ele é efetivamente uma constante), o tipo do valor resultante do `sizeof` é sempre do mesmo tipo de `size_t`.
+Na maioria dos casos, com exceção de arrays de tamanho variável, o operador `sizeof` é avaliado durante a compilação, portanto seu uso não afeta o tempo de execução (nesses casos ele é efetivamente uma constante), o tipo do valor resultante do `sizeof` é sempre do mesmo tipo de `size_t`.
 
 ```c
     int arr[40];
@@ -325,7 +325,7 @@ Na maioria dos casos, com exceção de arrays de tamanho variavel, o operador `s
     //geralmente 4 nos processadores/compiladores modernos
     sizeof(int); 
 
-    /* É possível utilizar "sizeof" na mesma linha que uma variavel
+    /* É possível utilizar "sizeof" na mesma linha que uma variável
        é declarada e mesmo que "*pessoa" seja indefinido, o operador 
        "sizeof" funciona normalmente                                 */    
     struct Pessoa *pessoa = malloc(sizeof(*pessoa));
@@ -372,7 +372,7 @@ struct alignas(64) Arquivo {
 ```
 
 ### Operador typeof
-O operador `typeof` foi adicionado apenas no `C23`, ele sempre resulta num tipo de variavel, que pode ser utilizado em todos lugares onde um tipo de variavel normalmente seria utilizado (seja na definição de variaveis, parâmetros de função, membros de uma estrutura,etc).
+O operador `typeof` foi adicionado apenas no `C23`, ele sempre resulta num tipo de variável, que pode ser utilizado em todos lugares onde um tipo de variável normalmente seria utilizado (seja na definição de variaveis, parâmetros de função, membros de uma estrutura,etc).
 
 De forma similar ao operador `sizeof`, ele funciona com tipos e variaveis, e não avalia os valores das variaveis que ele recebe, apenas
 as usa para extrair o tipo.
