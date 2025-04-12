@@ -86,7 +86,7 @@ enum SetWindowPosFlags : uin32_t {
 ## Uso inteligente de enums
 Existem algumas técnicas interessantes que podem ser feitas com `enum`, essa seção busca compartilhar essas ideias para que você possa aplicar em seu código, algumas dessas dicas provavelmente envolvem constantes no geral e podem ser realizadas da mesma forma usando o preprocessador com `#define`.
 
-1. `enum` para constantes de números inteiros 
+### 1 - `enum` para constantes de números inteiros 
 
 Antes do advento da palavra chave `constexpr`, utilizar `enum` era uma das únicas formas de definir constantes de números inteiros em C sem depender do preprocessador (`#define`), e mesmo com `constexpr` ainda é uma forma muito simples e menos verbosa para declaração de múltiplas constantes relacionadas.
 
@@ -101,7 +101,7 @@ enum{
 };
 ```
 
-2. Tamanho do `enum`
+### 2 - Tamanho do `enum`
 
 É muito comum utilizarmos `enum` para indicar um entre uma lista de possíveis etapas, valores, objetos, etc.
 
@@ -124,9 +124,13 @@ enum UtensiliosCozinha {
 };
 ```
 
-3. `enum` com bitmask
+### 3 - `enum` com bitmask
 
 Neste caso é bem comum em vários headers em C utilizar `#define` para isso, da mesma forma `enum` pode ser utilizado nos mesmos casos, portanto o que está descrito aqui é muito mais uma técnica genérica usada com constantes do que efetivamente com `enum`.
+
+O nome "bitmask" significa "máscara de bits", e é uma técnica que envolve o uso dos bits para codificar valores, geralmente com cada bit representando um valor [booleano](./3-03-booleanos.md).
+
+É possível, por exemplo, colocar até 32 valores booleanos simultâneos em um mesmo bitmask que resida em um inteiro de 32bits, isso significa que é possível condensar múltiplas opções e estados em um mesmo valor e possivelmente checar qualquer combinação deles de forma muito mais simples e eficiente.
 
 A ideia é que assim como descrito nos [operadores bit a bit](./2-operadores.md#operadores-bit-a-bit), é possível realizar operações separadas que checam bits em separado de um mesmo valor.
 
@@ -169,7 +173,7 @@ int main()
 ```
 
 
-4. `enum` local
+### 4 - `enum` local
 
 Como o `enum` obedece o escopo atual, é possível utilizá-lo para definir constantes que só existem dentro de uma função, logo são privadas e não afetam o escopo global.
 

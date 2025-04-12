@@ -12,4 +12,6 @@
 - [Funções](./6-funcoes.md)
 - [Variáveis Compostas](./7-00-variaveis-compostas.md)
   - [Enumerações](./7-01-enumeracoes.md)
+  - [Arrays](./7-02-arrays.md)
+  
 - [Apêndice](./x-00-apendice.md)
