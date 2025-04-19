@@ -1,4 +1,4 @@
-## Funções
+# Funções
 Funções são parcelas de código "reutilizável", escritas para que possamos dar um nome a um pedaço de código e reutilzá-lo em diversas situações, possívelmente com parâmetros diferentes.
 
 As principais vantagens ao utilizar funções são : 

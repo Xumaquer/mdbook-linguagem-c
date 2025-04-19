@@ -89,7 +89,7 @@ Se houver uma inicialização, sempre que um elemento não for especificado, o v
     char str2[] = "abcd";
     
     //Também tem tamanho 5
-    wchar_t str3 = L"abcd";
+    wchar_t str3[] = L"abcd";
 
     //Nesse caso, todos os 400 elementos são zero
     int arr3[400] = {0};
@@ -134,7 +134,8 @@ const char *iconPath[] = {
 
 int main()
 {
-    //Macros que causam problema ao compilar quando o tamanho do array não bate com o enum
+    //Macros que causam problema ao compilar quando o tamanho do array
+    //não bate com o enum
     BUILD_BUG_ON(PROGRAM_ICON_AMOUNT != ARRAY_SIZE(iconPath));
 }
 ``` 
@@ -241,7 +242,7 @@ Ao utilizarmos `static` podemos permitir que o compilador de C realize otimizaç
         preencheTabuada(8.0, tabuada1);
 
         //Errado, provavelmente vai gerar um aviso no compilador
-        //ou causar comportamento indefinido
+        //ou causa comportamento indefinido
         preencheTabuada(5.0, tabuada2); 
     }
 ```  
@@ -282,6 +283,20 @@ Continuando esse exemplo no código :
     */
 ```
 
+De uma maneira mais visual e simples, abaixo temos uma imagem que demonstra essa equivalência de um array de uma dimensão com um de duas dimensões : 
+
+![](./img/array_subscription.png)
+
+
+Observe como o array `a` tem uma quantidade de elementos total equivalente ao array multidimensional `b`.
+
+Da mesma forma, ambos são sequenciais na memória, você pode pensar nos quadrados coloridos abaixo de `a` como a "verdadeira" representação de `b` na memória, enquanto a representação abaixo de `b` como a representação lógica que estamos dando a essa memória quando a distribuimos em uma matriz.
+
+A imagem também descreve a forma com que acessamos elementos ao usarmos indices em `a` e `b`, ao descrever quais elementos acessamos ao aumentar os valores de `i` e `j`.
+
+
+### Dica ao usar arrays multidimensionais
+
 Ao utilizarmos um array de múltiplas dimensões também é importante lembrarmos que iterar primeiro pelos indices mais a direita é mais eficiente, pois estamos efetivamente acessando a memória de maneira sequencial.
 
 O exemplo abaixo demonstra as duas formas de acesso de uma maneira mais clara :
@@ -308,6 +323,8 @@ O exemplo abaixo demonstra as duas formas de acesso de uma maneira mais clara :
         }
     }
 ```
+
+### Usos de arrays multidimensionais
 
 Utilizar um array de múltiplas dimensões geralmente é útil para representar uma variadade de coisas, alguns exemplos são : 
 
