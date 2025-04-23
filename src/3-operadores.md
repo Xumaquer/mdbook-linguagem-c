@@ -159,7 +159,7 @@ Como assim quando isso é "necessário" ? bem se eu sei que um `AND lógico` só
 
 O mesmo se aplica para o `OR lógico`, se o primeiro valor é `Verdadeiro`, eu não preciso saber o resultado do segundo.
 
-Logo caso o primeiro valor já seja o suficiente para estabelecer o resultado da expressão, a avaliação do segundo valor é ignorada, isso se torna ainda mais poderoso quando juntamos isso com [Funções](./6-funcoes.md).
+Logo caso o primeiro valor já seja o suficiente para estabelecer o resultado da expressão, a avaliação do segundo valor é ignorada, isso se torna ainda mais poderoso quando juntamos isso com [Funções](./7-funcoes.md).
 
 ```c
     /*
@@ -216,19 +216,20 @@ Operações comuns utilizando os operadores bit a bit:
 ## Operadores Especiais
 A linguagem C também apresenta alguns operadores adicionais que não se encaixam nas outras categorias, estes operadores geralmente fornecem funcionalidades únicas.
 
-| Operador   | Descrição                         |
-| ---------- | --------------------------------- |
-| `()`       | Chamada de função                 |
-| `,`        | Operador virgula                  |
-| `(tipo)`   | Conversão de tipo                 |
-| `? :`      | Ternário                          |
-| `sizeof`   | Tamanho de                        |
-| `_AlignOf` | Alinhamento de (`C11`)            |
-| `_Alignas` | Alinhar como (`C11`)              |
-| `typeof`   | Tipo de (`C23`)                   |
+| Operador        | Descrição                         |
+| --------------- | --------------------------------- |
+| `()`            | Chamada de função                 |
+| `,`             | Operador virgula                  |
+| `(tipo)`        | Conversão de tipo                 |
+| `? :`           | Ternário                          |
+| `sizeof`        | Tamanho de                        |
+| `_AlignOf`      | Alinhamento de (`C11`)            |
+| `_Alignas`      | Alinhar como (`C11`)              |
+| `typeof`        | Tipo de (`C23`)                   |
+| `typeof_unqual` | Tipo sem modificadores de (`C23`) |
 
 ### Chamada de função 
- Ao chamar uma [função](./6-funcoes.md) , utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variável guardando o endereço de uma função).
+ Ao chamar uma [função](./7-funcoes.md) , utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variável guardando o endereço de uma função).
 
 ### Operador virgula
 Este operador é utilizado para adicionar uma expressão adicional, ignorando o resultado da expressão anterior, mas ainda levando em consideração os seus efeitos colaterais. Por exemplo ao escrevermos `a,b`, os efeitos colaterais de `a` são aplicados, porém, o resultado da expressão como um todo será o resultado de `b`.
@@ -347,7 +348,7 @@ objeto possa ser alocado.
 ### Operador _Alignas
 Da mesma forma que o operador `_AlignOf`, foi adicionada no `C11`com a `stdalign.h` para permitir seu uso como `alignas`, que foi incorporado a linguagem no `C23`, dispensando o `stdalign.h`.
 
-Este operador é usado para forçar um requisito de alinhamento diferente em variaveis.
+Este operador é usado para forçar um requisito de alinhamento diferente em variaveis, porém ele não pode ser usado para forçar um requisito de alinhamento menor do que o requisito mínimo do tipo.
 
 A utilidade desse operador é um tanto difícil de entender, mas ele basicamente funciona como uma forma de controlar o alinhamento para possivelmente melhorar a performance.
 
@@ -399,6 +400,9 @@ int *p,*q,*r;
 //OU
 typeof(int*) p,q,r;
 ```
+
+# Operador typeof_unqual
+Funciona de maneira similar ao operador `typeof`, porém todos os modificadores de tipos de variáveis como `volatile`, `const`, `restrict`, `_Atomic` não são levados em consideração.
 
 ## Ordem de precedência
 

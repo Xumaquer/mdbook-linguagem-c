@@ -1,4 +1,4 @@
-# Caractere
+# Caracteres
 Caracteres são representados pelo tipo `char`, que também representa o menor tipo inteiro.
 
 Isso acontece pois caracteres são representados por códigos númericos, que indicam diferentes caracteres.

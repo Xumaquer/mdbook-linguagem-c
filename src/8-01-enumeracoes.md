@@ -1,5 +1,7 @@
 # Enumerações
-Enumerações são tipos de dados que definem um intervalo limitado de números inteiros. Ele é efetivamente equivalente a um tipo inteiro primitivo.
+Enumerações são tipos de dados que definem um intervalo limitado de números inteiros. Eles são efetivamente equivalentes a tipos inteiros primitivos.
+
+Utilizar enumerações geralmente permite uma integração melhor com ferramentas de debug e avisos do compilador, demonstrando a intenção do programador de usar um número que faz parte de um conjunto limitado de valores.
 
 ## Declaração de enum
 
@@ -13,9 +15,9 @@ enum NomeDoEnum{
     ConstantesDoEnum
 }VariaveisCriadas;
 ```
-- O campo `NomeDoEnum` indica o nome do enum, usado para definir novas variáveis do tipo do enum, este campo é opcional, caso esteja ausente o enum gerado é "anônimo" e não pode ser criado fora da declaração do enum (neste caso seu tipo não tem nome mas existe).
-- O campo `ConstantesDoEnum` é uma lista, que deve conter ao menos um elemento, de nomes de constantes que serão geradas, separadas por virgula (geralmente uma em cada linha), que podem, opcionalmente, ser inicializados com uma expressão constante (isso será explicado em mais detalhes a seguir).
-- O campo `VariaveisCriadas` é opcional e indica uma lista separada por virgula de variáveis que serão criadas junto da declaração do enum com o tipo que está sendo declarado, é a única forma de criar variáveis do tipo de um enum anônimo (além claro, do uso de `typeof` com uma variável criada desta forma).
+- `NomeDoEnum` indica o nome do enum, usado para definir novas variáveis do tipo do enum, este campo é opcional, caso esteja ausente o enum gerado é "anônimo" e não pode ser criado fora da declaração do enum (neste caso seu tipo não tem nome mas existe).
+- `ConstantesDoEnum` é uma lista, que deve conter ao menos um elemento, de nomes de constantes que serão geradas, separadas por virgula (geralmente uma em cada linha), que podem, opcionalmente, ser inicializados com uma expressão constante (isso será explicado em mais detalhes a seguir).
+- `VariaveisCriadas` é opcional e indica uma lista separada por virgula de variáveis que serão criadas junto da declaração do enum com o tipo que está sendo declarado, é a única forma de criar variáveis do tipo de um enum anônimo (além claro, do uso de `typeof` com uma variável criada desta forma).
 
 Logo uma enumeração que busca ter valores inteiros indicando dias da semana pode ser escrita da seguinte forma: 
 ```c
@@ -67,6 +69,8 @@ Todas as constantes de um `enum` declarado desse forma tem o tipo que foi defini
 Aqui temos um exemplo de como ficariam as flags da função [SetWindowPos](https://learn.microsoft.com/pt-br/windows/win32/api/winuser/nf-winuser-setwindowpos) da API do Windows, em um `enum`, utilizando as funcionalidades do `C23` para forçar o valor como inteiro sem sinal de 32bits:
 
 ```c
+#include <inttypes.h>
+
 enum SetWindowPosFlags : uin32_t { 
     SWP_NOSIZE         = 0x1,
     SWP_NOMOVE         = 0x2,
@@ -128,11 +132,11 @@ enum UtensiliosCozinha {
 
 Neste caso é bem comum em vários headers em C utilizar `#define` para isso, da mesma forma `enum` pode ser utilizado nos mesmos casos, portanto o que está descrito aqui é muito mais uma técnica genérica usada com constantes do que efetivamente com `enum`.
 
-O nome "bitmask" significa "máscara de bits", e é uma técnica que envolve o uso dos bits para codificar valores, geralmente com cada bit representando um valor [booleano](./3-03-booleanos.md).
+O nome "bitmask" significa "máscara de bits", e é uma técnica que envolve o uso dos bits para codificar valores, geralmente com cada bit representando um valor [booleano](./4-03-booleanos.md).
 
 É possível, por exemplo, colocar até 32 valores booleanos simultâneos em um mesmo bitmask que resida em um inteiro de 32bits, isso significa que é possível condensar múltiplas opções e estados em um mesmo valor e possivelmente checar qualquer combinação deles de forma muito mais simples e eficiente.
 
-A ideia é que assim como descrito nos [operadores bit a bit](./2-operadores.md#operadores-bit-a-bit), é possível realizar operações separadas que checam bits em separado de um mesmo valor.
+A ideia é que assim como descrito nos [operadores bit a bit](./3-operadores.md#operadores-bit-a-bit), é possível realizar operações separadas que checam bits em separado de um mesmo valor.
 
 No exemplo abaixo temos um uso de bitmask para indicar status negativos de um RPG: 
 

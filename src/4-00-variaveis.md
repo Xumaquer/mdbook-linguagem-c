@@ -26,15 +26,49 @@ A linguagem C diferencia entre nomes em letra maiúscula e letra minúscula, log
 ## Modificadores de tipo
 Ao declarar variáveis podemos adicionar modificadores, que servem para especificar detalhes adicionais sobre a variável e seu tipo.
 
-| Modificador | Descrição                                                   |
-| ----------- | ----------------------------------------------------------- | 
-| `const`     | Define que a variável não pode mudar seu valor              | 
-| `constexpr` | Define que a variável é uma constante de compilação (`C23`) |
-| `restrict`  | Indica que o ponteiro não sofre de aliasing                 |               
-| `volatile`  | Impede reordenamento e remoção de leitura e escrita         |                
-| `signed`    | Usado para definir um inteiro com sinal                     |
-| `unsigned`  | Usado para definir um inteiro sem sinal                     |
+| Modificador | Descrição                                                       |
+| ----------- | --------------------------------------------------------------- | 
+| `_Atomic`   | Define que as operações de leitura/escrita são atômicas (`C11`) |
+| `const`     | Define que a variável não pode mudar seu valor                  | 
+| `constexpr` | Define que a variável é uma constante de compilação (`C23`)     |
+| `restrict`  | Indica que o ponteiro não sofre de aliasing                     |               
+| `volatile`  | Impede reordenamento e remoção de leitura e escrita             |                
+| `signed`    | Usado para definir um inteiro com sinal                         |
+| `unsigned`  | Usado para definir um inteiro sem sinal                         |
 
+### _Atomic
+Introduzido no `C11`, o modificador `_Atomic` indica que as operações de leitura e escrita com um valor são atômicas.
+
+Mas o que seria uma operação atômica? É uma operação que evita o que chamamos de "Condição de corrida" ou no inglês "data race".
+
+Uma condição de corrida é um problema que pode acontecer quando há mais de um thread (mais de um fluxo de execução) simultâneamente escrevendo/lendo de uma mesma variável ou local na memória.
+
+Em caso do conflito descrito acima, um programa tem uma condição de corrida a menos que uma das condições abaixo seja cumprida : 
+- Ambas operações de leitura/escrita sejam atômicas
+- Uma das operações acontece antes da outra (ou seja, elas não acontecem ao mesmo tempo)
+
+Caso uma condição de corrida ocorra, o comportamento do programa é indefinido, mas na prática o comportamento mais comum é que um valor intermediário antes da atualização completa por uma das partes seja lido pela outra, de forma que ela opere com um valor inválido e os cálculos envolvendo essa variável também tenham resultados "incorretos".
+
+Ao mesmo tempo que operações atômicas evitam condições de corrida, elas também são consideravelmente mais lentas, por isso só devem ser utilizadas se realmente há um risco de uma condição de corrida ocorrer.
+
+Qualquer compilador pode definir a macro `__STDC_NO_ATOMICS__` para indicar que `_Atomic` não é suportado.
+
+> Para entender de forma mais simples como uma condição de corrida ocorre
+> imagine dois fluxos de execução que querem incrementar em 1 um contador.
+>
+> Imagine que o contador inicia em 0 e a seguinte sequência de operações ocorra : 
+>
+> - Fluxo 1 lê o valor do contador (0)
+> - Fluxo 1 incrementa o valor do contador no seu registrador (1)
+> - Fluxo 2 lê o valor do contador (0)
+> - Fluxo 1 guarda o valor atualizado (1)
+> - Fluxo 2 incrementa o valor do contador no seu registrador (1)
+> - Fluxo 2 guarda o valor atualizado (1)
+> 
+> Percebe como um contador que deveria ter 2, acabou resultando no valor 1 ?
+>
+> É isso que normalmente acontece com uma condição de corrida, valores são atualizados
+> sem levar em consideração modificações do outro fluxo.
 
 ### Const
 O modificador `const` faz com que o valor não possa ser modificado após sua definição.
@@ -240,7 +274,9 @@ O modificador `register` é utilizado para indicar que uma variável deve ser di
 
 `register` implica duração `automática` e `sem vinculação` assim como a palavra chave `auto`.
 
-Antigamente o modificador `register` era útil, ajudando nas otimizações ao fornecer dicas ao compilador, mas hoje em dia, com o compiladores super inteligentes, eles acabam tendo muito mais informação do que nós sobre uma variedade de parâmetros ao decidir sobre otimizações.
+Antigamente o modificador `register` era útil, ajudando nas otimizações ao fornecer dicas ao compilador, mas hoje em dia, com a presença de compiladores super inteligentes, eles acabam tendo muito mais informação do que nós sobre uma variedade de parâmetros ao decidir sobre otimizações, diminuindo ou eliminando vantagens que normalmente seriam oferecidas pela palavra chave `register`.
+
+Apesar disso, vale relembrar que a palavra chave `register` ainda é a única forma de "proibir" o uso do endereço de uma variável.
 
 ### static
 O modificador `static` tem dois usos, ele pode ser usado dentro de blocos para definir variáveis que só podem ser acessadas no bloco mas tem duração `estática`, ou seja, mantêm o valor entre execuções da função e são efetivamente guardadas no mesmo lugar que variáveis globais seriam.
@@ -275,6 +311,46 @@ Já em variáveis, o modificador funciona como uma "importação" de uma variáv
 De forma similar ao `_AlignOf` descrito nos operadores, o modificador `thread_local` foi introduzido no `C11` como `_Thread_local` junto da macro `thread_local` presente em `threads.h`, porém no `C23`, `thread_local` se tornou efetivamente um modificador válido no C.
 
 O modificador `thread_local` simplesmente indica que a variável é local do thread, e é criada justamente quando um thread é criado. De forma que cada thread tenha sua própria cópia da variável, sendo ainda possível utilizar `static`/`extern` para ajustar o tipo de vinculação.
+
+## Palavra chave typedef
+A palavra chave `typedef` é utilizada para definir um novo tipo de variável que é efetivamente um apelido para um tipo já existente.
+
+O `typedef` também pode ser utilizado para gerar um apelido simplificado para um tipo complexo que tenha modificadores como `const`, `volatile`, `_Atomic` e/ou seja um ponteiro, ponteiro de função, etc.
+
+A sintaxe para uso do `typedef` é igual a sintaxe de declaração de uma variável, no qual ao invés de criarmos uma variável, o nome que essa variável teria se torna o nome do novo tipo definido.
+
+Essa similaridade se torna ainda mais evidente quando percebemos que de forma similar a declaração de uma variável, podemos declarar vários apelidos com um único `typedef` : 
+
+```c
+//Ao criar uma variável :
+
+//Cria um "char" chamado "a"
+//Um "ponteiro para char" chamado "b"
+//E um "array fixo de char" chamado "c"
+char a, *b, c[10];
+
+//De forma similar, ao usar typedef : 
+
+//Cria um apelido para "char" chamado "ac"
+//Cria um apelido para "ponteiro para char" chamado "bc"
+//Cria um apelido para "array fixo de 10 chars" chamado "cc"
+typedef char ac, *bc, cc[10];
+
+//Agora é possível criar variáveis usando os apelidos!
+ac v1; //char     chamado v1
+bc v2; //char*    chamado v2
+cc v3; //char[10] chamado v3
+```
+
+Ao perceber a similaridade entre declarações de variáveis e `typedef`, é dispensável explicações adicionais de como utilizar `typedef` com qualquer outra declaração mais complexa de tipos, pois o comportamento é exatamente o mesmo da declaração de uma variável.
+
+Existe apenas uma única exceção desse comportamento do `typedef` onde é possível criar um apelido para um [array](./8-02-arrays.md) de tipo incompleto, que pode ser posteriormente completado : 
+```c
+typedef char caracteres[];
+
+//usa um typedef de um tipo incompleto, que foi completado na declaração
+caracteres vogais = {'a','e','i','o','u'};
+```  
 
 ## Variáveis primitivas
 Variáveis primitivas são todas variáveis que utilizam tipos que existem inerentemente na linguagem e não dependem da existência de outros tipos.

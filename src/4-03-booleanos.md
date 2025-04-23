@@ -5,7 +5,7 @@ No geral ao ler valores booleanos :
 - `Falso` indica um valor igual a zero
 - `Verdadeiro` indica um valor diferente de zero
 
-Porém como já foi descrito nos [operadores booleanos](./2-operadores.md#operadores-booleanos) :
+Porém como já foi descrito nos [operadores booleanos](./3-operadores.md#operadores-booleanos) :
 - Expressões booleanas que resultam em `Falso` tem o valor 0
 - Expressões booleanas que resultam em `Verdadeiro` tem o valor 1
 

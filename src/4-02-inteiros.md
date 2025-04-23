@@ -111,12 +111,12 @@ O propósito do POSIX ao utilizar `ssize_t` é a possibilidade de utilizar os va
 
 `max_align_t` no geral é utilizado junto com o operador `alignof`.
 
-## Tipo _BigInt
-Adicionado apenas no `C23`, o tipo é declarado como `_BigInt(N)` onde `N` é o número de bits que o tipo deve ter com cada valor de `N` sendo considerado um tipo diferente.
+## Tipo _BitInt
+Adicionado apenas no `C23`, o tipo é declarado como `_BitInt(N)` onde `N` é o número de bits que o tipo deve ter com cada valor de `N` sendo considerado um tipo diferente.
 
-Os tipos `_BigInt` ainda podem ter o modificador `unsigned` e para valores com sinal, o número de `N` inclui o bit de sinal, de forma que `_BigInt(1)` não seja um tipo válido (pois não sobra nenhum bit pro valor).
+Os tipos `_BitInt` ainda podem ter o modificador `unsigned` e para valores com sinal, o número de `N` inclui o bit de sinal, de forma que `_BitInt(1)` não seja um tipo válido (pois não sobra nenhum bit pro valor).
 
-A mesma regra descrita nos [limites de inteiros](#limites-de-inteiros) se aplicam para calcular os limites de um valor do tipo `_BigInt`.
+A mesma regra descrita nos [limites de inteiros](#limites-de-inteiros) se aplicam para calcular os limites de um valor do tipo `_BitInt`.
 
 ## Inteiros definidos pela implementação
 Desde o `C99`, existe a possibilidade dos compiladores terem tipos inteiros adicionais adicionados a linguagem, tipos como `__uint128` e `__int128` que simbolizam inteiros de 128 bits, porém o suporte e existência desses tipos depende da arquitetura e do compilador utilizado.

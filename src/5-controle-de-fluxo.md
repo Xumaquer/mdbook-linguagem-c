@@ -25,7 +25,7 @@ int main()
 
 Este fluxo delimitado por statements sequenciais pode ser desviado e modificado condicionalmente, ao utilizarmos palavras chaves para controle de fluxo.
 
-[Laços de repetição](./5-lacos-de-repeticao.md) também são uma forma de controle de fluxo, porém serão melhor explicados na página seguinte.
+[Laços de repetição](./6-lacos-de-repeticao.md) também são uma forma de controle de fluxo, porém serão melhor explicados na página seguinte.
 
 
 # If 

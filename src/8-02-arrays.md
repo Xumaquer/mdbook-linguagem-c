@@ -106,13 +106,12 @@ Esse tipo de inicialização é particularmente útil quando combinado com enume
 
 Exemplo usando inicializadores designados para vincular elementos de um enum a um array.
 ```c
+#include <assert.h>
+
 #define ICON_PATH "/usr/config/icons"
 
 //Calcula o tamanho de um array
 #define ARRAY_SIZE(X) (sizeof(X)/sizeof(*X))
-
-//Causa um problema de compilação se a condição for verdadeira
-#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
 
 enum ProgramIcons{
     PROGRAM_MAIN_ICON,
@@ -134,9 +133,9 @@ const char *iconPath[] = {
 
 int main()
 {
-    //Macros que causam problema ao compilar quando o tamanho do array
+    //Causa problema ao compilar quando o tamanho do array
     //não bate com o enum
-    BUILD_BUG_ON(PROGRAM_ICON_AMOUNT != ARRAY_SIZE(iconPath));
+    static_assert(PROGRAM_ICON_AMOUNT != ARRAY_SIZE(iconPath), "Atualize o array!!");
 }
 ``` 
 
