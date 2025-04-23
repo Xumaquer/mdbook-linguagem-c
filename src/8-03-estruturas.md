@@ -28,7 +28,7 @@ De forma similar a arrays, estruturas também podem ser inicializadas utilizando
 
 Exemplo de declaração de uma estrutura definido dados de uma pessoa, junto com 3 formas diferentes de inicialização : 
 ```c
-#include 
+#include <string.h>
 
 //Numa implementação onde "int" é 4 bytes, sizeof(struct Pessoa) tem 104 bytes.
 struct Pessoa {
@@ -95,7 +95,7 @@ Neste caso, mesmo que `struct DadoNodo` ainda não exista, é possível declarar
 ### Membro de array flexível
 A definição de uma estrutura pode incluir como seu último membro um campo de array "incompleto", onde o tamanho não é especificado.
 
-O tamanho de tal membro não é incluido no tamanho da estrutura ao utilizar `sizeof`, esta estratégia normalmente é utilizado quando planejamos alocar dinamicamente a estrutura, reservando um espaço variável para o último campo.
+O tamanho de tal membro não é incluido no tamanho da estrutura ao utilizar `sizeof`, esta estratégia normalmente é utilizada quando planejamos alocar dinamicamente a estrutura, reservando um espaço variável para o último campo.
 
 Exemplo de uso do membro de array flexível para criação de um vetor dinâmico que guarda o tamanho do array :
 ```c
@@ -120,7 +120,7 @@ int main()
 ### Campos de bits
 Campos de bits ou no inglês "bit fields", são uma forma alternativa de declarar membros em uma estrutura, permitindo a escolha da quantidade de bits que o campo deverá ocupar.
 
-Com isso é possível ter vários membros que compartilham o mesmo byte de outros membros, portanto o endereço de um membro declarado com campo de bits não pode ser utilizado.
+Com isso é possível ter vários membros que compartilham do mesmo byte de outros membros, portanto o endereço de um membro declarado com campo de bits não pode ser utilizado.
 
 Campos de bits são declarados com a seguinte sintaxe : 
 ```c
@@ -148,7 +148,7 @@ Dito isso, há vários detalhes sobre campos de bits que são "definidos pela im
 ### Alinhamento de estruturas
 Ao definir estruturas, compiladores são livres para adicionar bytes extras de forma a garantir que os membros da estrutura estejam alinhados.
 
-Cada tipo primitivo tem um número de bytes considerado como "requisito de alinhamento" diferente e diz-se que um campo está "alinhado" quando sua distância em bytes do início da estrutura é múltipla do seu requisito de alinhamento.
+Cada tipo primitivo tem um número de bytes considerado como "requisito de alinhamento" diferente e diz-se que um campo está "alinhado" quando seu endereço e tamanho são múltiplos do requisito de alinhamento.
 
 O padrão do C apenas especifica que bytes extras podem ser adicionados por questão de alinhamento, mas não entra em detalhes sobre a forma como isso deve ser feito, mantendo esse detalhe como "definido pela implementação", repassando a responsabilidade aos compiladores e especificações de ABI para cada plataforma.
 
