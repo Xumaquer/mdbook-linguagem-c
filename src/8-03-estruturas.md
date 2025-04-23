@@ -201,7 +201,8 @@ struct teste2 {
 
 int main()
 {
-    static_assert(sizeof(struct teste1) == sizeof(struct teste2), "Alinhamento diferente");
+    static_assert(sizeof(struct teste1) == sizeof(struct teste2), 
+                  "Alinhamento diferente");
 }
 ```
 

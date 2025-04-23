@@ -14,5 +14,6 @@
 - [Variáveis Compostas](./8-00-variaveis-compostas.md)
   - [Enumerações](./8-01-enumeracoes.md)
   - [Arrays](./8-02-arrays.md)
+  - [Estruturas](./8-03-estruturas.md)
   
 - [Apêndice](./x-00-apendice.md)
