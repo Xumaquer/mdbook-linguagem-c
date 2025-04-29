@@ -156,7 +156,7 @@ Também é importante lembrar que desde o `C99`, não é necessário escrever `r
 ## Declaração de funções
 Se uma função é definida no C, ela geralmente deve ser definida antes da função que a utiliza, sem isso, compilar o programa resulta em um erro de compilação.
 
-Porém, existe uma forma de burlar isso, declarando a função sem definir ou implementar ela.
+Porém, existe uma forma de burlar isso, declarando a função sem definir ou implementar ela, esse tipo de declaração também é chamado como uma declaração de um "protótipo de função".
 
 Exemplo : 
 ```c

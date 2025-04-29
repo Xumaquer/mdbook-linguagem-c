@@ -19,7 +19,7 @@ Onde :
 - `listaCampos` : Uma lista de zero ou mais campos definindo os membros de uma estrutura, onde cada membro é composto pelo nome do tipo, nome do membro e um ponto e virgula.
 - `variaveis` : é opcional e indica uma lista separada por virgula de variáveis que serão criadas junto da declaração da estrutura com o tipo que está sendo declarado, é a única forma de criar variáveis do tipo de uma estrutura anônima (além claro, do uso de `typeof` com uma variável criada desta forma).
 
-Lembrando que os campos de uma estrutura devem ter tamanho conhecido, com a única exceção do campo de array flexível, que será detalhado depois.
+Lembrando que os campos de uma estrutura devem ter tamanho conhecido portanto não podem ser tipos incompletos, com a única exceção do campo de array flexível, que será detalhado depois.
 
 Vale lembrar que toda declaração de uma estrutura tem escopo, portanto é possível, assim como em um `enum`, declarar estruturas locais que só existem dentro de um bloco.
 
@@ -39,6 +39,8 @@ struct Pessoa {
 
 int main() 
 {
+    //Campos são preenchidos na mesma ordem da estrutura
+    //e se não forem preenchidos, terão o valor 0
     struct Pessoa pessoa1 = {"Joao", "123.456.789-10", 25};
     
     struct Pessoa pessoa2 = {
@@ -56,44 +58,131 @@ int main()
 
 Vale lembrar que no C++ os inicializados designados precisam estar na mesma ordem de declaração dos membros da estrutura, porém, no C eles podem estar fora de ordem.
 
-## Pre-declaração de estruturas
-Estruturas também podem ser pre-declaradas utilizando apenas a palavra chave `struct` e o nome da estrutura.
+## Estruturas incompletas
+Mesmo se uma estrutura ainda não foi declarada, ponteiros para ela podem ser criados, neste caso, a estrutura é efetivamente um tipo incompleto, impossibilitando o uso de `sizeof` ou acesso aos seus valores.
 
-Ao pre-declarar uma estrutura, ela se torna um tipo incompleto, onde o tamanho não está disponível com `sizeof` mas pode ser utilizada em uma declaração com `typedef`.
+Ponteiros para estruturas incompletas não podem ser utilizados para ler/escrever valores, mas podem ser repassados para outras funções, o que é muito comum no padrão "pimpl".
 
-Exemplo de pre-declaração de estrutura : 
+Exemplo de declarações envolvendo estruturas incompletas : 
 ```c
-//Pre-declaração normal
-struct Nodo; //Desnecessário fazer assim, pois já a declaramos na linha do typedef
 
-//Dessa forma, o tipo "struct Nodo" pode ser acessado com apenas o nome "Nodo"
-typedef struct Nodo Nodo;
+//Neste caso, uma lista encadeada tem um ponteiro
+//do próprio tipo (que durante a declaração ainda é incompleto)
+struct ListaEncadeada{
+    struct ListaEncadeada *proximo;
+    void *dado;
+};
 
-struct Nodo {
-    Node *proximo;
-    int dado;
+//Neste caso é feito um ponteiro para "struct Pessoa" 
+//Antes da definição, o tipo é inicialmente incompleto,
+//mas é completado após a definição de "struct Pessoa"
+struct VetorPessoa {
+    size_t quantidade;
+    struct Pessoa *pessoas;
+};
+
+struct Pessoa {
+    char nome[85];
+    char cpf[15]; //XXX.XXX.XXX-XX
+    int idade;
 };
 ```
 
-Na maioria das vezes, exceto quando utilizamos `typedef`, pre-declarar uma estrutura dessa forma é desnecessário, pois quando declaramos um ponteiro para uma estrutura ela também já é automáticamente pre-declarada.
+### pimpl 
 
-Exemplo de estrutura pre-declarada ao utilizar ponteiros : 
+O padrão pimpl (pointer to implementation ou "ponteiro para implementação" no português), é utilizado para encapsular e remover ou limitar o acesso aos campos da estrutura, impedindo efetivamente que código externo dependa da forma como os dados da estrutura são organizados.
 
+O exemplo mais comum desse padrão sendo aplicado na prática é o próprio tipo `FILE*` presente na biblioteca padrão do C na `stdio.h`, isso ocorre pois a forma de representar um arquivo pode ser diferente entre sistemas operacionais ou até entre diferentes versões da biblioteca padrão.
+
+Esse padrão normalmente é aplicado ao definir em um arquivo de cabeçário, o protótipo de funções que operam com um ponteiro da estrutura, sem declarar efetivamente a estrutura, a mantendo como um tipo incompleto. Enquanto, ao mesmo tempo, define um arquivo que implementa e define as funções e a estrutura.
+
+Exemplo abaixo do uso do padrão "pimpl" para mapear um arquivo em memória no windows:
 ```c
-struct Nodo {
-    struct Nodo *proxima;
-    struct DadoNodo *dados;
-};
+//Código do .h (cabeçário)
+#ifndef ARQUIVO_MAPEADO_H
+#define ARQUIVO_MAPEADO_H
 
-struct DadoNodo {
-    int num;
-    char nome[16];
-};
+    //Define um typedef que será utilizado pelas funções
+    typedef struct ArquivoMapeado ArquivoMapeado;
+
+    ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho);
+
+    void *acessarArquivoMapeado(ArquivoMapeado *mapa);
+
+    size_t tamanhoArquivoMapeado(ArquivoMapeado *mapa);
+
+    void fecharArquivoMapeado(ArquivoMapeado *mapa);
+#endif 
 ```
-Neste caso, mesmo que `struct DadoNodo` ainda não exista, é possível declarar um ponteiro para ela normalmente, e depois ao declarar efetivamente o tipo, ele se torna um tipo completo que pode ser usado com `sizeof` e poderá ser acessado através do campo `dados` da estrutura `Nodo`.
 
-### Membro de array flexível
-A definição de uma estrutura pode incluir como seu último membro um campo de array "incompleto", onde o tamanho não é especificado.
+``` c
+//Código do .c para Windows
+#include "arquivoMapeado.h"
+#include <stdlib.h>
+#include <windows.h>
+
+struct ArquivoMapeado {
+    HANDLE objeto;  /* Objeto do mapa de memoria */
+    void *dados;    /* Ponteiro para dados*/
+    size_t tamanho; /* Tamanho do arquivo */
+};
+
+struct ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho)
+{
+    
+    HANDLE arquivo = CreateFileA(caminho, GENERIC_READ | GENERIC_WRITE,
+                                 FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL, NULL);
+    
+
+    if(arquivo == INVALID_HANDLE_VALUE)
+        return NULL;
+
+    struct ArquivoMapeado *mapa = malloc(sizeof(*mapa));
+    mapa->objeto = CreateFileMappingW(arquivo, NULL, PAGE_READWRITE | SEC_COMMIT, 0, 0, NULL);
+    mapa->dados  = NULL;
+        
+    if(mapa->objeto == NULL)
+        goto mapa_falhou;
+    
+    DWORD tamAlto;
+    mapa->dados   = MapViewOfFile(mapa->objeto, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+    mapa->tamanho = GetFileSize(arquivo, &tamAlto);
+    if(sizeof(size_t) == 8) //Caso "size_t" seja 64bits, adiciona a parte alta do tamanho
+        mapa->tamanho |= (size_t)tamAlto << 32;
+
+mapa_falhou:
+    CloseHandle(arquivo);
+    return mapa;
+}
+
+void *acessarArquivoMapeado(ArquivoMapeado *mapa)
+{
+    return mapa->dados;
+}
+
+size_t tamanhoArquivoMapeado(ArquivoMapeado *mapa) 
+{
+    return mapa->tamanho;
+}
+
+void fecharArquivoMapeado(ArquivoMapeado *mapa)
+{
+    if(mapa == NULL)
+        return; //Proteção contra ponteiro nulo
+
+    if(mapa->dados != NULL) 
+        UnmapViewOfFile(mapa->dados);
+    if(mapa->objeto != NULL)
+        CloseHandle(mapa->objeto);
+    free(mapa);
+}
+```
+
+No caso descrito acima, poderiamos implementar outra versão do arquivo `.c` que funcione para linux sem a necessidade de mudarmos o código que chama essas funções, oferecendo uma flexibilidade e facilidade para tornar o código portável.
+
+## Membro de array flexível
+Desde o `C99`, a definição de uma estrutura pode incluir como seu último membro um campo de array "incompleto", onde o tamanho não é especificado.
 
 O tamanho de tal membro não é incluido no tamanho da estrutura ao utilizar `sizeof`, esta estratégia normalmente é utilizada quando planejamos alocar dinamicamente a estrutura, reservando um espaço variável para o último campo.
 
@@ -117,7 +206,7 @@ int main()
 }
 ```  
 
-### Campos de bits
+## Campos de bits
 Campos de bits ou no inglês "bit fields", são uma forma alternativa de declarar membros em uma estrutura, permitindo a escolha da quantidade de bits que o campo deverá ocupar.
 
 Com isso é possível ter vários membros que compartilham do mesmo byte de outros membros, portanto o endereço de um membro declarado com campo de bits não pode ser utilizado.
@@ -145,7 +234,7 @@ Dito isso, há vários detalhes sobre campos de bits que são "definidos pela im
 - Se tipos atômicos são permitidos em um campo de bits
 - Se a ordem dos bits de campos de bits em sequência é da esquerda para direita ou da direita para esquerda.
 
-### Alinhamento de estruturas
+## Alinhamento de estruturas
 Ao definir estruturas, compiladores são livres para adicionar bytes extras de forma a garantir que os membros da estrutura estejam alinhados.
 
 Cada tipo primitivo tem um número de bytes considerado como "requisito de alinhamento" diferente e diz-se que um campo está "alinhado" quando seu endereço e tamanho são múltiplos do requisito de alinhamento.
@@ -159,15 +248,18 @@ A forma mais precisa e efetiva de descobrir como exatamente o alinhamento é lid
 - [`ABI x86-64 SystemV`](https://gitlab.com/x86-psABIs/x86-64-ABI)
 - [`ABI ARM Windows`](https://learn.microsoft.com/pt-br/cpp/build/overview-of-arm-abi-conventions?view=msvc-170#alignment)
 - [`ABI ARM64 Windows`](https://learn.microsoft.com/pt-br/cpp/build/arm64-windows-abi-conventions?view=msvc-170#alignment)
+- [`Detalhes de implementação do GCC para ARM`](https://developer.arm.com/documentation/dui0491/i/C-and-C---Implementation-Details/Structures--unions--enumerations--and-bitfields)
 
 No geral é possível saber quando uma estrutura teve bytes extras adicionais devido ao alinhamento quando o tamanho resultante de `sizeof` da estrutura, excede a soma total do tamanho de todos os seus membros.
 
 Também é importante citar que a maioria dos compiladores oferece alguma extensão que permite forçar o alinhamento de uma estrutura, isso é particularmente útil quando estamos lendo um formato de arquivo ou realizando uma comunicação entre diferentes aplicações e queremos forçar o compilador a não alinhar os membros da estrutura.
 
-#### Comportamento convencional ao alinhar estruturas
+### Comportamento convencional ao alinhar estruturas
 Apesar do padrão do C não especificar nada, vamos falar do comportamento mais convencional das implementações em relação ao alinhamento, que pode ou não estar correto para a sua plataforma (mas provavelmente está).
 
-##### Requisitos de alinhamento
+Então as seções seguintes não devem ser levadas ao pé de letra, pois podem não refletir todos os ambientes e compiladores disponíveis.
+
+#### Requisitos de alinhamento
 
 No geral o requisito de alinhamento de cada tipo geralmente é exatamente o tamanho do maior tipo primitivo ou ponteiro que o compõem.
 
@@ -177,8 +269,8 @@ Arrays terão sempre requisito de alinhamento igual ao tipo usado para formar um
 
 Estruturas seguem a mesma regra, terão o requisito de alinhamento igual ao membro com o maior requisito de alinhamento.
 
-##### Ordem de declaração e alinhamento
-No geral, "buracos de bytes" são adicionados logo após o membro que deseja ser alinhado.
+#### Ordem de declaração e alinhamento
+No geral, "buracos de bytes" são adicionados logo após o membro que deseja ser alinhado e tanto os seus membros quanto a estrutura como um todo geralmente são alinhados.
 
 Devido ao comportamento de uma estrutura de manter os seus elementos sequenciais na memória EXATAMENTE na forma como foram declarados, a ordem dos elementos pode alterar o tamanho da estrutura.
 
