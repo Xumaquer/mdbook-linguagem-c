@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "inttypes.h": "c"
     }
 }

@@ -58,6 +58,8 @@ int main()
 
 Vale lembrar que no C++ os inicializados designados precisam estar na mesma ordem de declaração dos membros da estrutura, porém, no C eles podem estar fora de ordem.
 
+Antes do `C23`, de forma similar a arrays, para inicializar todos elementos de uma estrutura em 0, é necessário utilizar `{0}`.
+
 ## Estruturas incompletas
 Mesmo se uma estrutura ainda não foi declarada, ponteiros para ela podem ser criados, neste caso, a estrutura é efetivamente um tipo incompleto, impossibilitando o uso de `sizeof` ou acesso aos seus valores.
 
@@ -139,7 +141,8 @@ struct ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho)
         return NULL;
 
     struct ArquivoMapeado *mapa = malloc(sizeof(*mapa));
-    mapa->objeto = CreateFileMappingW(arquivo, NULL, PAGE_READWRITE | SEC_COMMIT, 0, 0, NULL);
+    mapa->objeto = CreateFileMappingW(arquivo, NULL, PAGE_READWRITE | SEC_COMMIT,
+                                      0, 0, NULL);
     mapa->dados  = NULL;
         
     if(mapa->objeto == NULL)
@@ -148,7 +151,9 @@ struct ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho)
     DWORD tamAlto;
     mapa->dados   = MapViewOfFile(mapa->objeto, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     mapa->tamanho = GetFileSize(arquivo, &tamAlto);
-    if(sizeof(size_t) == 8) //Caso "size_t" seja 64bits, adiciona a parte alta do tamanho
+
+    //Caso "size_t" seja 64bits, adiciona a parte alta do tamanho
+    if(sizeof(size_t) == 8) 
         mapa->tamanho |= (size_t)tamAlto << 32;
 
 mapa_falhou:
@@ -206,6 +211,45 @@ int main()
 }
 ```  
 
+## Membro de estrutura ou união anônima
+Desde o `C11`, cada membro de uma estrutura ou união anônima que foi declarada dentro de uma estrutura é considerado como um membro direto dela.
+
+Essa definição funciona de forma recursiva, portanto se uma estrutura ou união anônima tiver mais membros na mesma condição, todos os membros serão incorporados pela estrutura não anônima.
+
+Exemplificando, a forma de acesso da estrutura a seguir :
+```c
+struct Teste1 {
+    int a;
+    struct {
+        int b;
+        int c;
+    };
+    int d;
+};
+
+//Exemplo de uso
+struct Teste1 test;
+test.c = 10;
+```
+
+É exatamente a mesma forma com que acessariamos :
+```c
+struct Teste2 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+
+//Exemplo de uso
+struct Teste2 test;
+test.c = 10;
+``` 
+
+No geral, essa regra normalmente é utilizada em conjunto com uniões para simplificar o acesso a alguns membros.
+
+Alguns lugares usam macros especificas para lidar com versões anteriores do C que não suportam membros de estruturas ou uniões anônimas, a microsoft por exemplo utiliza macros como `DUMMYSTRUCTNAME` e `DUMMYUNIONNAME` que definem um nome caso não haja esse suporte.
+
 ## Campos de bits
 Campos de bits ou no inglês "bit fields", são uma forma alternativa de declarar membros em uma estrutura, permitindo a escolha da quantidade de bits que o campo deverá ocupar.
 
@@ -220,7 +264,6 @@ tipo identificador : tamanho;
 - `identificador` é o nome do membro, que é opcional, pois uma declaração de campo de bits também pode ser utilizada apenas para inserir um "buraco" com a quantidade de bits especificada na estrutura.
 - `tamanho` é a quantidade de bits que o campo deve ter.
 
-
 Os tipos que um campo de bits podem ter são limitados a : 
 - `unsigned int` : O campo de bits é um inteiro sem sinal (ex: `unsigned int b : 3;` tem os limites `[​0​, 7]`)
 - `signed int` : O campo de bits é um inteiro com sinal, reservando 1 dos bits para o sinal (`signed int b : 3;` tem os limites `[-4,3]`)
@@ -228,7 +271,52 @@ Os tipos que um campo de bits podem ter são limitados a :
 - `bool` : Pode ser utilizado para campos de bits de tamanho igual a 1, segue o mesmo comportamento de uma variável booleana.
 - `_BitInt`: Também pode ser utilizado para campos de bits com ou sem o modificador `unsigned`.
 
-Dito isso, há vários detalhes sobre campos de bits que são "definidos pela implementação" :
+No geral, apesar de ser definido pela implementação, o comportamento mais comum com campos de bits é que os valores são agrupados para compartilhar os bytes de um mesmo tipo.
+
+Ao definir o tipo do bit field, a quantidade de bytes que o tipo fora de um bit field normalmente ocuparia é reservada para todos os campos de bit seguintes que usem o mesmo tipo, ou sua respectiva versão com ou sem sinal.
+
+Para entender melhor, os exemplos a seguir, vamos levar em consideração : 
+-  `C23` ou a biblioteca `stdbool.h` já incluida
+- `bool` com 1 byte 
+- `short` com 2 bytes e permitido em bit fields
+- `int` com 4 bytes 
+- Arquitetura onde 1 byte é 8bits
+- Desconsiderar bytes extras colocado para alinhar membros e a estrutura
+
+Neste exemplo teriamos uma estrutura com 5 bytes, pois 4 bytes foram reservados para os próximos bitfields de tipo `int`/`unsigned int`/`signed int`, porém como logo em seguida encontramos um do tipo `bool` que é diferente, houve uma outra reserva de mais 1 byte.
+```c
+struct BitField1 {
+    unsigned int membro1 : 1;
+    bool membro2 : 1;
+};
+```
+
+Neste outro exemplo, teriamos uma estrutura de 1 byte, pois utilizamos apenas tipo `bool` em todos os campos, o ocupando totalmente : 
+```c 
+struct BitField2 {
+    bool membro1 : 1;
+    bool membro2 : 1;
+    bool membro3 : 1;
+    bool membro4 : 1;
+    bool membro5 : 1;
+    bool membro6 : 1;
+    bool membro7 : 1;
+    bool membro8 : 1;
+};
+```
+
+Neste caso, temos 6 bytes, pois os membros 1 até o 3 ocupam totalmente os 32bits ocupados por um `int` e os membros 4 a 5 ocupam os 16bits ocupados por um `short`.
+```c
+struct BitField3 {
+    unsigned int   membro1 : 4;
+    signed int     membro2 : 16;
+    unsigned int   membro3 : 12;
+    unsigned short membro4 : 8;
+    signed short   membro5 : 8;
+}
+```
+
+Dito isso, há vários outros detalhes sobre campos de bits que também são "definidos pela implementação" :
 - Se um campo de bits do tipo `int` tem ou não sinal
 - Se tipos além dos mencionados acima são suportados em campos de bits (ex: `short`, `long`, `char`, etc)
 - Se tipos atômicos são permitidos em um campo de bits

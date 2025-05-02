@@ -75,12 +75,12 @@ Lá existem definições para inteiros de 8,16,32 e 64bits e suas respectivas ve
 
 Eu poderia listar todos eles, mas é mais fácil entender a regra dos nomes, considere que pedaços em colchetes `[]`, são opcionais e `/` são alternativas ao mesmo valor. 
 
-`[u]int[fast/least]X_t`
+`[u]int[_fast/_least]X_t`
 
 - `X` é o número de bits, podendo ser 8, 16, 32 ou 64
 - `u` é o modificador para uma versão sem sinal do tipo
-- `fast` é o modificador para obter o tipo "mais eficiente para manuseio" que tenha pelo menos o tamanho especificado
-- `least` é o modificador para obter o menor tipo que tenha "pelo menos aquele tamanho"
+- `_fast` é o modificador para obter o tipo "mais eficiente para manuseio" que tenha pelo menos o tamanho especificado
+- `_least` é o modificador para obter o menor tipo que tenha "pelo menos aquele tamanho"
 - Na ausência de `fast` e `least`, o tipo tem EXATAMENTE a quantidade de bits em `X`. 
 
 Exemplos : 

@@ -60,7 +60,7 @@ Vale lembrar que apesar das constantes do `enum` serem normalmente do tipo `int`
 
 Vários compiladores geralmente oferecem flags de compilação especificas para forçar tipos `enum` a serem menores ou não, oferecendo opção para que tipos menores do que `int` sejam utilizados caso seja possível.
 
-Devido a falta de garantia quanto ao tamanho real de um enum, é comum que as pessoas evitem `enum` onde é necessário um tamanho fixo e garantido, ou escrevam constantes com valores altos que forcem um determinado limite (como por exemplo uma constante com `0x7FFFFFFF` para forçar um `enum` a ter ao menos 32bits).
+Devido a falta de garantia quanto ao tamanho real de um enum, é comum que as pessoas evitem `enum` onde é necessário um tamanho fixo e garantido, ou escrevam constantes com valores altos que forcem um determinado limite (como por exemplo uma constante com `0xFFFFFFFF` para forçar um `enum` a ter ao menos 32bits).
 
 No `C23`, as regras anteriores ainda se aplicam, porém, existe uma nova forma de declaração que inclui `: TIPO`, onde `TIPO` é o tipo que será utilizado para representação do `enum`.
 

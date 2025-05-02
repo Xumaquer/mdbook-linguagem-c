@@ -73,6 +73,87 @@ Sumário das explicações e introduções a palavras chaves presentes no docume
 - [`Estruturas`](./8-03-estruturas.md): `struct`.
 - [`Uniões`](./8-04-unioes.md): `union`.
 
+## _Generic
+Adicionada no `C11`, a palavra chave `_Generic` permite que você escolha uma expressão entre várias baseado no tipo de uma expressão em tempo de compilação.
+
+A sintaxe para uso de `_Generic` é : 
+```c
+_Generic(expressao-tipo, lista-associacao);
+```
+Onde `lista-associacao` é uma lista de associação de tipos que segue a sintaxe : 
+```
+nomeTipo : expressao
+```
+
+- `lista-associacao` segue uma sintaxe similar a palavra chave `switch`, onde há uma lista de possíveis associações para uma mesma expressão, mas ao invés de valores, estamos checando sua associação com tipos.
+- `expressao-tipo` é uma expressão qualquer, que terá apenas seu tipo avaliado, portanto qualquer efeito colateral não será aplicado, que, obviamente, não pode incluir o operador `,`.
+- `nomeTipo` é um tipo qualquer que não seja incompleto ou um array de tamanho variável ou a palavra chave `default`, indicando a expressão que será escolhido caso o tipo da `expressao-tipo` não bata com nenhum outro.
+- `expressao` é uma expressão qualquer, de qualquer tipo ou valor, que pode inclusive ser uma função.
+
+Exemplo do uso de `_Generic` para obter nomes de tipos primitivos e verificar qual o tipo utilizado por cada definição : 
+```c
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+
+#define nometipo(X) _Generic((X)0, \
+    unsigned char:"unsigned char", \
+    signed char:"signed char", \
+    char: "char", \
+    unsigned short:"unsigned short", \
+    short:"short", \
+    unsigned int:"unsigned int", \
+    int:"int", \
+    unsigned long:"unsigned long", \
+    long:"long", \
+    unsigned long long:"unsigned long long", \
+    long long:"long long", \
+    bool:"bool")
+
+int main()
+{
+    printf(
+        "uint8_t  = %s\n"
+        "uint16_t = %s\n"
+        "uint32_t = %s\n"
+        "uint64_t = %s\n"
+        "size_t   = %s\n"
+        "wchar_t  = %s\n",
+        nometipo(uint8_t),  nometipo(uint16_t), 
+        nometipo(uint32_t), nometipo(uint64_t), 
+        nometipo(size_t), nometipo(wchar_t)  
+    );
+}
+```
+
+Mas o uso mais comum de `_Generic` continua sendo para seleção de funções, no exemplo abaixo temos as diversas versões para obter o valor absoluto de um número para cada tipo em uma mesma macro :
+```c
+#include <stdlib.h>
+#include <math.h>
+#define abs(X) _Generic(X, \
+    int:abs, \
+    long:labs, \
+    long long:llabs, \
+    float:fabsf, \
+    double:fabs, \
+    long double:fabsl)(X)
+
+int main()
+{
+    int a         = abs(1);
+    long b        = abs(1L);
+    long long c   = abs(1LL);
+    float d       = abs(1.0f);
+    double e      = abs(1.0);
+    long double f = abs(1.0L);
+}
+```
+
+Uma das motivações para a inclusão dessa palavra chave na linguagem é a possibilidade de permitir que o usuário implemente funções genéricas para tipos como as introduzidas no `C99` pela biblioteca `tgmath.h`.
+
+As funções da biblioteca `tgmath.h` originalmente eram implementadas usando extensões de cada compilador, porém o `_Generic` possibilita que o próprio usuário implemente um padrão similar em seu código.
+
 ## static_assert
 A palavra chave `_Static_assert` foi adicionada no `C11`, mas é acessível através da macro `static_assert` presente na biblioteca `assert.h` que foi incorporada a linguagem no `C23`, dispensando a necessidade de incluir a biblioteca.
 
@@ -93,4 +174,3 @@ static_assert(expressao);
 Onde : 
 - `expressao` é a expressão que será avaliada para determinar se um erro de compilação será gerado.
 - `mensagem` é um literal de string indicando a mensagem que será exibida quando o erro é gerado, este campo era obrigatório até antes do `C23`.
-
