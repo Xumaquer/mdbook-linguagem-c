@@ -366,7 +366,7 @@ Em muitos casos o uso de ponteiros para passsagem de referência é realizado pe
 
 O fator determinante reside no tamanho em bytes de um ponteiro junto do leve custo adicional de acessar o valor via uma indireção.
 
-No geral, podemos começar considerar repassar um valor por referência como mais eficiente do que um `tipo` via ponteiro quando : 
+No geral, podemos começar considerar repassar um valor via ponteiro/referência como mais eficiente do que por valor quando : 
 ```c
 sizeof(tipo) > sizeof(void*) 
 ```
