@@ -62,6 +62,8 @@ Vários compiladores geralmente oferecem flags de compilação especificas para 
 
 Devido a falta de garantia quanto ao tamanho real de um enum, é comum que as pessoas evitem `enum` onde é necessário um tamanho fixo e garantido, ou escrevam constantes com valores altos que forcem um determinado limite (como por exemplo uma constante com `0xFFFFFFFF` para forçar um `enum` a ter ao menos 32bits).
 
+
+
 No `C23`, as regras anteriores ainda se aplicam, porém, existe uma nova forma de declaração que inclui `: TIPO`, onde `TIPO` é o tipo que será utilizado para representação do `enum`.
 
 Todas as constantes de um `enum` declarado desse forma tem o tipo que foi definido explicitamente.

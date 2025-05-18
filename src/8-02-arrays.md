@@ -249,7 +249,7 @@ Ao utilizarmos `static` podemos permitir que o compilador de C realize otimizaç
 ## Arrays multidimensionais
 Quando o tipo do elemento de um array é outro array, dizemos que este é um array multidimensional.
 
-Chamamos de dimensões, os campos necessários para acessar um array e subscripto ou índice os números utilizados em tais campos para acessar um array.
+Chamamos de dimensões, os campos necessários para acessar um array e subscrito ou índice os números utilizados em tais campos para acessar um array.
 
 Ao definirmos um array, podemos especificar, através de um número entre colchetes, uma das dimensões do array, a quantidade de dimensões que um array pode ter é limitada apenas pela quantidade de memória disponível.
 

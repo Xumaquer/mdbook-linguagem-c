@@ -34,7 +34,7 @@ int main()
 ## Reinterpretação de tipos
 Um uso muito comum de uniões é a possibilidade de realizar o que chamamos de reinterpretação de tipos, o que é comumente chamado no inglês de "type punning".
 
-O uso de uniões para esse propósito é permitido desde o `C99`, mas proibido no C++.
+O uso de uniões para esse propósito é permitido desde o `C99`, mas é comportamento indefinido no C++ e em versões anteriores do C.
 
 A reinterpretação de tipos seria efetivamente ler o valor de um tipo como se ele fosse outro, ao escrever em um dos membros do `union` e ler o valor por outro.
 

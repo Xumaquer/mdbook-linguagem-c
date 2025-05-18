@@ -16,5 +16,6 @@
   - [Arrays](./8-02-arrays.md)
   - [Estruturas](./8-03-estruturas.md)
   - [Uniões](./8-04-unioes.md)
+  - [Ponteiros](./8-05-ponteiros.md)
   
 - [Apêndice](./x-00-apendice.md)
