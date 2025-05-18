@@ -23,19 +23,9 @@ char *const d; //Ponteiro constante para caractere
 ## Explicação 
 Um ponteiro atua guardando um "endereço de memória", que pode ser utilizado para ler e escrever em outras variaveis ou no caso de ponteiros de função, executá-las.
 
-Ponteiros podem ser utilizados para implementar uma série de funcionalidades e ao entender cada uma delas, teremos um entendimento mais completo do conceito de ponteiros.
+Pense neles como um link para uma página, um atalho para um arquivo, um endereço de uma casa, basicamente uma informação utilizada para te levar a outra, permitindo um acesso direto mas sem ser uma cópia completa.
 
-Normalmente chamamos de "indireção" a necessidade de ler e acessar um endereço de memória para efetivamente ter acesso a uma variável, ponteiros podem ter vários "níveis de indireção", sinalizados pela quantidade de asteriscos usados na declaração da variável.
-
-Algumas das funcionalidades que podem ser implementadas com ponteiros : 
-- Passagem por referência 
-- Acesso a objetos alocados dinamicamente
-- Parâmetros "opcionais" 
-- Relacionar estruturas
-- Callbacks
-- Interfaces genéricas
-
-Algumas dessas funcionalidades serão explicadas e discutidas ao longo do texto.
+Este termo será útil ao longo do texto, normalmente chamamos de "indireção" a necessidade de ler e acessar um endereço de memória para efetivamente ter acesso a uma variável, ponteiros podem ter vários "níveis de indireção", sinalizados pela quantidade de asteriscos usados na declaração da variável.
 
 ## Como interpretar a sintaxe de ponteiros
 Cada asterisco utilizado para declarar um ponteiro indica um nível de indireção necessário para "chegar efetivamente" no tipo apontado, essa é a maneira pretendida pelos autores da linguagem para interpretarmos a sintaxe de ponteiros.
@@ -317,7 +307,18 @@ Na prática isso significa que podemos passar qualquer ponteiro a uma função q
 
 Ao mesmo tempo que funções como `malloc` que retornam `void*`, podem ser diretamente atribuidas a qualquer variavel de ponteiro sem necessidade de cast (no C apenas).
 
-## Passagem por referência
+## Usos de ponteiros
+Ponteiros podem ser utilizados para implementar uma série de funcionalidades e ao entender cada uma delas, teremos um entendimento mais completo do conceito de ponteiros.
+
+Algumas das funcionalidades que podem ser implementadas com ponteiros : 
+- Passagem por referência 
+- Acesso a objetos alocados dinamicamente
+- Parâmetros "opcionais" 
+- Relacionar estruturas
+- Callbacks
+- Interfaces genéricas
+
+### Passagem por referência
 O conceito de passagem de valor por referência envolve a forma como passamos variáveis a funções.
 
 Sempre que passamos um parâmetro a uma função, consideramos que a função recebe uma "cópia" do parâmetro original, logo qualquer modificação na cópia não altera a variável original que foi copiada, chamamos isso de "passagem por valor".
@@ -385,5 +386,6 @@ Na biblioteca `stdlib.h` existem as funções `malloc`, `realloc` e `free` que p
 Ao utilizar alocação dinamica, recebemos efetivamente um ponteiro para um bloco de memória que esteja livre e tenha pelo menos o tamanho solicitado, a questão é que o local exato desse bloco é decidido na hora e provavelmente será diferente a cada execução do programa.
 
 Logo, é impossível utilizar essa memória dinâmica sem utilizar ponteiros, pois precisamos de uma variável que possa guardar e acessar esse local "imprevisível" que conterá nossos dados.
+
 
 
