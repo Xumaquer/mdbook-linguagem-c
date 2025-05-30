@@ -89,7 +89,7 @@ enum SetWindowPosFlags : uin32_t {
 };
 ```
 
-## Uso inteligente de enums
+## Usos de enums
 Existem algumas técnicas interessantes que podem ser feitas com `enum`, essa seção busca compartilhar essas ideias para que você possa aplicar em seu código, algumas dessas dicas provavelmente envolvem constantes no geral e podem ser realizadas da mesma forma usando o preprocessador com `#define`.
 
 ### 1 - `enum` para constantes de números inteiros 

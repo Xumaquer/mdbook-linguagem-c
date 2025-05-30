@@ -271,6 +271,7 @@ Este operador é utilizado para converter um tipo para outro, algumas conversõe
 
     //dlsym é do tipo "void*", isso efetivamente só funciona
     //como uma extensão da linguagem pelos compiladores.
+    void (*fazCafe)(int);
     fazCafe = (void (*)(int)) dlsym(biblioteca,"fazerCafe");
     fazCafe(4);
 ```

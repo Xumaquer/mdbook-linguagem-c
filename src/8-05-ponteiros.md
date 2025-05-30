@@ -295,7 +295,6 @@ int main()
 }
 ```
 
-
 ## Ponteiro void
 No C é muito comum o uso do tipo `void*` para representar ponteiros, como todo ponteiro de dados tem o mesmo tamanho, podemos ter um parâmetro que indica um ponteiro de dados "genérico" com o `void*`.
 
@@ -305,18 +304,73 @@ Qualquer ponteiro de dados pode ser implicitamente convertido para `void*` (tant
 
 Na prática isso significa que podemos passar qualquer ponteiro a uma função que aceita `void*`, mas se a função deseja acessá-los, ela deve fazer um cast ou passar para uma variável que seja um ponteiro de um tipo conhecido.
 
+É muito comum o uso do cast para o tipo `char*` para somar ou subtrair um ponteiro `void*` num offset em bytes.
+
 Ao mesmo tempo que funções como `malloc` que retornam `void*`, podem ser diretamente atribuidas a qualquer variavel de ponteiro sem necessidade de cast (no C apenas).
+
+## Strict aliasing
+Uma das regras mais violadas e mal entendidas do C é a regra de `strict aliasing` que indica que valores com um tipo efetivo `T1` não podem ser acessados por um ponteiro para um outro tipo `T2`.
+
+As exceções para essa regra são : 
+- Se o tipo `T2` for `char`, `signed char` ou `unsigned char`, pois os tipos de "caractere" são efetivamente considerados pela linguagem como tipos especiais próprios para manipular bytes.
+- O tipo `T1` e o tipo `T2` são variações com e sem sinal do mesmo tipo.
+- O tipo `T2` é um `union` que contêm o tipo `T1`.
+
+O exemplo abaixo demonstra dois acessos, um inválido e um válido, seguindo essas regras:
+```c
+//Inválido (tipos incompatíveis)
+float a;
+int *b = (int*)&a;
+*b = 10;
+
+//Válido (tipo T2 é um tipo de caractere)
+float c;
+char *d = (char*)&c;
+*d = 10;
+```
+
+A ideia inicial dessa regra foi permitir uma otimização que posteriormente poderia ser habilitada manualmente com a palavra chave `restrict` : 
+```c
+//Como "int" e "double" são tipos diferentes
+//assume-se que "tam" e "arrdbl" apontam SEMPRE para endereços diferentes
+void preencheDouble(int *tam, double *arrdbl, double valor)
+{
+    //Neste caso, "tam" pode ser lido uma única vez da memória e guardado em cache
+    for(int i = 0; i < *tam; i++)
+        *arrdbl++ = valor;
+}
+
+//Como ambos tem o mesmo tipo
+//O compilador não pode assumir que "tam" e "arrint" apontam para endereços diferentes
+void preencheInteiro(int *tam, int *arrint, int valor)
+{
+    //Neste caso, "tam" deve ser lido novamente a cada escrita em "arrint"
+    for(int i = 0; i < *tam; i++)
+        *arrint++ = valor;
+}
+```
+
+A diferença parece incrivelmente sutil, mas essa regra permite que o compilador de C otimize acessos a tipos diferentes que atendam a ela assumindo que aliasing NUNCA acontecerá, ao mesmo tempo que permite que ele remova ou inultilize código que viole as regras de aliasing.
+
+Em contrapartida, quando a regra não se aplicar, os compiladores de C são proibidos de realizarem esse tipo de otimização, dependendo do uso manual da palavra chave `restrict`.
+
+Em alguns casos, a única forma de realizar um cast de ponteiros e ainda respeitar essa regra é realizar uma cópia dos dados via `memcpy` ou depender de extensões de compiladores, motivo pelo qual muitos desenvolvedores, inclusive Linus Torvalds o criador do linux, criticam muito a existência e motivação da regra. 
+
+Lembrando que mesmo ao utilizar `memcpy`, muitos compiladores modernos consideram a função como uma operação inerente da linguagem e percebem sua intenção em usar ela no lugar de um cast, não realizando efetivamente uma cópia no código final.
+
+Em muitos compiladores, as otimizações relacionadas a aliasing podem não estar presentes nas versões de debug/desenvolvimento, portanto se escrevermos um código que viole essas regras, ele pode funcionar durante os testes mas falhar na versão final com otimizações.
+
+Muitos compiladores também fornecem como extensão, uma forma de indicar "quando um ponteiro pode causar um aliasing proposital" ou opções de compilador como `-fno-strict-aliasing` que forçam o compilador a desconsiderar essa regra.
 
 ## Usos de ponteiros
 Ponteiros podem ser utilizados para implementar uma série de funcionalidades e ao entender cada uma delas, teremos um entendimento mais completo do conceito de ponteiros.
 
 Algumas das funcionalidades que podem ser implementadas com ponteiros : 
-- Passagem por referência 
-- Acesso a objetos alocados dinamicamente
-- Parâmetros "opcionais" 
-- Relacionar estruturas
-- Callbacks
-- Interfaces genéricas
+- [Passagem por referência](#passagem-por-referência) 
+- [Acesso a variáveis alocadas dinamicamente](#acesso-a-variáveis-alocadas-dinamicamente)
+- [Parâmetros opcionais](#parâmetros-opcionais-com-ponteiros-nulos) 
+- [Múltiplos retornos](#multiplos-retornos)
+- [Callbacks](#callback)
 
 ### Passagem por referência
 O conceito de passagem de valor por referência envolve a forma como passamos variáveis a funções.
@@ -387,5 +441,109 @@ Ao utilizar alocação dinamica, recebemos efetivamente um ponteiro para um bloc
 
 Logo, é impossível utilizar essa memória dinâmica sem utilizar ponteiros, pois precisamos de uma variável que possa guardar e acessar esse local "imprevisível" que conterá nossos dados.
 
+### Parâmetros opcionais com ponteiros nulos
+É possível utilizar o valor de ponteiro nulo (com a constante `NULL`), para indicar um valor opcional ausente : 
+```c
+#include <stdlib.h>
+#include <stdio.h>
 
+//Entrada é um texto "opcional" que será imprimido antes de ler o terminal 
+int lerInteiro(const char *entrada) {
+    char linha[1024];
+    
+    if(entrada != NULL)
+        fputs(entrada, stdout);
 
+    fgets(linha, sizeof(linha), stdin);
+    return (int)strtol(linha, NULL, 10);
+}
+```
+
+O padrão é ideal para tipos que já são ponteiros, como strings, estruturas, etc. 
+
+O mesmo padrão poderia ser utilizado para tipos primitivos como inteiros e números de ponto flutuante, porém é muito difícil justificar essa escolha por dois motivos:
+
+1. Passar tipos primitivos via ponteiro é, no geral, menos eficiente.
+2. A necessidade de representar um valor "inválido" pode ser suprida ao reservar um dos possíveis valores (como por exemplo `0` ou no caso de ponto flutuante `NaN`) como o "valor inválido".
+
+### Multiplos retornos
+Algumas linguagens de programação permitem múltiplos retornos, um exemplo disso é a linguagem Python : 
+```python
+#Retorna o número e o nome da empresa
+def telefoneEmpresa():
+    return 987317364, "Pedro Pneus"
+```  
+
+Porém a linguagem C suporta apenas um único valor de retorno, há alguns motivos para tal : 
+- Aproxima a linguagem da implementação do retorno de funções nas arquiteturas de processadores e convenções de chamada (onde o resultado é geralmente colocado em um registrador específico).
+- Aproxima a linguagem do sentido matemático de uma função, onde há sempre apenas um resultado.
+
+Há três formas de burlar essa limitação :
+- Encapsular os dados em um tipo `struct`, que pode ser retornado diretamente (não é aconselhável para dados grandes, pois gera cópias custosas)
+- Passar um ou mais parâmetros "adicionais" como ponteiros, e fazer com que a função os preencha.
+- Apesar de não recomendado, é possível utilizar variáveis globais para atingir o mesmo resultado.
+
+A forma mais simples é utilizar ponteiros para preencher os parâmetros adicionais, levando até alguns autores a realizar uma separação entre parâmetros de `entrada`, `saída` ou `entrada e saída`.
+
+```c
+#include <math.h>
+
+/* Podemos considerar `r` como um parâmetro de saída
+   ele é um array de 2 elementos com as duas respostas da bhaskara */
+bool bhaskara(double a, double b, double c, double *r)
+{
+    double delta = b*b - 4*a*c; 
+    
+    if(delta < 0)
+        return false;
+
+    double raizDelta = sqrt(delta);
+
+    r[0] = (-b + raizDelta) / (2*a);
+    r[1] = (-b - raizDelta) / (2*a);
+    return true;
+}
+```
+
+No caso citado acima, temos 3 retornos, um `bool` indicando sucesso/falha da bhaskara, e mais dois `double` em um array indicando a resposta da bhaskara.
+
+> Uma dica é agrupar os valores em `struct` ou arrays, o que diminui a quantidade de ponteiros que precisam ser repassados a função.
+
+### Callback
+Chamamos de `callback` uma função que é guardada numa variável para que possa ser executada posteriormente.
+
+Na linguagem C, a forma efetiva de fazermos um `callback` é utilizando ponteiros de função, geralmente repassado como parâmetro a uma outra função.
+
+Um exemplo bem comum é o uso das funções `bsearch` e `qsort` que utilizam uma função de parâmetro para realizar a operação de comparar elementos : 
+```c
+#include <stdlib.h>
+#include <stdio.h>
+#define ARRAY_SIZE(X) (sizeof(X)/sizeof(*X))
+
+//Realiza comparação entre os valores 
+// (retornando 0 se iguais, positivo se v1>v2, negativo se v1<v2)
+int compara_int(const void *v1, const void *v2)
+{
+    const int *i1 = v1;
+    const int *i2 = v2;
+    return *i1 - *i2;
+}
+
+int main()
+{
+    int lista[] = {20,30,40,50,10};
+
+    //qsort recebe um ponteiro para "compara_int" de parâmetro 
+    // e chama a função internamente usada para ordenar os elementos
+    qsort(lista, ARRAY_SIZE(lista), sizeof(*lista), compara_int);
+
+    //Printa a lista ordenada
+    for(int i = 0; i < ARRAY_SIZE(lista); i++)
+        printf("%d ", lista[i]);
+    putchar('\n');
+}
+```
+No geral callbacks são utilizados para :
+- Efetuar uma ação quando algo ocorre ou após o termino de uma ação/processo (geralmente utilizado com bibliotecas e/ou funções do sistema).
+- Ao enumerar informações, podemos utilizar callbacks para efetuar uma ação para cada informação obtida, sem a necessidade de montar uma lista (evitando alocações de memória).
+- Permitir uma flexbilização maior, onde a responsabilidade de especificar como algo será feito é repassada ao usuário (como é o caso da função de comparação do `qsort` e `bsearch`).

@@ -73,7 +73,7 @@ int main()
 }
 ```
 
-## Uso inteligente de uniões
+## Usos de uniões
 Existem algumas técnicas interessantes que podem ser feitas com `union`, essa seção busca compartilhar essas ideias para que você possa aplicar em seu código.
 
 ### 1 - Bitmask e booleanas
