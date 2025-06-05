@@ -110,6 +110,7 @@ ptr[0] = 30; //Modifica array[1] devido ao incremento do ponteiro
 ptr--;       //Permitido, agora ptr[0] novamente modificará array[0]
 ```
 
+
 Basicamente, ponteiros tem um comportamento similar a arrays, porém o operador `sizeof` relatará o tamanho de um ponteiro e podemos somar/subtrair da variável do ponteiro para avançar/retroceder elementos.
 
 Neste caso, podemos pensar num ponteiro como uma junção de "array" + "indice" em um único valor.
@@ -141,6 +142,30 @@ int main()
 Quando somamos ou subtraimos um ponteiro, obtemos um ponteiro avançando/retrocedendo elementos equivalente a soma/subtração, logo `ptr+1` é equivalente a `&ptr[1]`.
 
 Esse comportamento também demonstra a importância do tipo do ponteiro, pois digamos que `ptr` represente um ponteiro para um tipo que tem 8 bytes e esteja no endereço `0x200`, `ptr+1` estará no endereço `0x208`, logo somar 1 no ponteiro, na verdade está somando 8 internamente.
+
+
+O exemplo abaixo, demonstra algumas operações aritméticas que podem ser realizadas com ponteiros : 
+```c
+int arr[10];
+int *inicio = arr;
+int *fim    = &arr[9];
+
+//9, diferenças entre ponteiros resultam na quantidade de elementos entre eles
+ptrdiff_t diff = fim - inicio;       
+
+//10, o tamanho do array!
+ptrdiff_t tam  = (fim - inicio + 1); 
+
+//estas três expressões tem o mesmo endereço : 
+inicio+1; 
+&inicio[1];
+&arr[1];
+
+//estas três, tem o mesmo endereço também :
+fim-1;
+&fim[-1];
+&arr[8];
+```  
 
 Além disso, um fato curioso sobre o operador `[]` pode ser visto no exemplo abaixo : 
 ```c

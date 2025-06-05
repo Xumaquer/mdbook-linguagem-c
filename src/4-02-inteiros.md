@@ -121,8 +121,52 @@ A mesma regra descrita nos [limites de inteiros](#limites-de-inteiros) se aplica
 ## Inteiros definidos pela implementação
 Desde o `C99`, existe a possibilidade dos compiladores terem tipos inteiros adicionais adicionados a linguagem, tipos como `__uint128` e `__int128` que simbolizam inteiros de 128 bits, porém o suporte e existência desses tipos depende da arquitetura e do compilador utilizado.
 
+## Overflow e underflow
+Ao tratarmos de números inteiros, é comum o uso dos seguintes termos : 
+- `overflow` : Em tradução literal, seria um "transbordamento", esse termo é utilizado para indicar quando chegamos em um valor que vai além do limite que uma variável suporta.
+- `underflow`: Em tradução literal, seria um "subtransbordamento", esse termo é utilizado para indicar quando chegamos um valor abaixo do limite mínimo que uma variável suporta.
+
+O comportamento padrão para calcularmos o valor resultante quando ocorre `overflow` ou `underflow` é : 
+- `overflow`:  `VALOR_MAXIMO + X` se tornará `VALOR_MINIMO + (X - 1)` para `X > 0`
+- `underflow`: `VALOR_MINIMO - X` se tornará `VALOR_MAXIMO - (X - 1)` para `X > 0`
+
+Para inteiros com sinal, o comportamento de `overflow` e `underflow` é indefinido, portanto qualquer checagem como `i + 1 < i` é transformada em `false` durante as otimizações, porém na prática quando um `overflow` ou `underflow` acontece e usamos complemento de dois (o que é o padrão), temos o comportamento descrito acima.
+
+O teste abaixo demonstra um exemplo ao escrever um `overflow` e `underflow` de um inteiro com sinal de 8bits (lembre-se que pelas regras da linguagens, estamos invocando um comportamento indefinido):
+```c
+#include <stdio.h>
+#include <limits.h>
+
+int main()
+{
+    signed char test1 = SCHAR_MAX;
+    signed char test2 = SCHAR_MIN;
+
+    //"%hhd" é o modificador para escrever um signed char no printf
+    printf("%hhd %hhd\n", test1 + (signed char)1, test2 - (signed char)1);
+}
+```
+
+Já para inteiros sem sinal, o `overflow` e `underflow` são definidos, e seguem o mesmo comportamento descrito, o que pode ser preocupante pois `0 - 1` gera o valor máximo, logo o perigo de `underflow` é muito maior. É por esse motivo que alguns autores aconselham evitar o uso de inteiros sem sinal, justamente pela facilidade de gerar um `underflow` ao realizar subtrações, no qual devemos ter muito cuidado sempre que realizamos subtrações.
+
+Exemplo de `overflow` e `underflow` com inteiros sem sinal (neste caso, este comportamento é definido pela linguagem, garantindo que funcione em qualquer lugar):
+
+```c
+#include <stdio.h>
+#include <limits.h>
+
+int main()
+{
+    unsigned int test1 = UINT_MAX;
+    unsigned int test2 = 0;
+
+    //"%u" é o modificador para escrever um unsigned int no printf
+    printf("%u %u\n", test1 + 1U, test2 - 1U);
+}
+``` 
+
 ## Dicas para uso consciente de inteiros
-No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem geralmente um `int` de pelo menos 32bits, a menos que sejam processadores embarcados).
+No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem geralmente um `int` de pelo menos 32bits, a menos que sejam processadores embarcados de 16/8 bits ou arquiteturas super específicas).
 
 Em casos onde operações com bits ou tamanhos fixos são necessários, os tipos `uintx_t` e `intx_t` são utilizados para especificar um tamanho fixo.
 

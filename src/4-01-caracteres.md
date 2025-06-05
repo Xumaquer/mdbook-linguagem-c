@@ -35,9 +35,9 @@ Sendo elas:
 - `\'` : Usado para digitar o caractere `'` pois ele é normalmente usado para literais de caractere
 - `\"` : Usado para digitar o caractere `"` pois ele é normalmente usado para literais de string
 - `\\` : Usado para digitar o caractere `\` pois ele é usado para sequências de escape
-- `\ ooo`: Usado para digitar um cactere em uma string, indicando uma sequência no sistema númerico octal, `ooo` deve ser números de `0` a `8`
-- `\x hh`: Usado para digitar um caractere ASCII, diretamente no seu valor em hexadecimal, `hh` deve ser 2 digitos hexadecimais.
-- `\x hhhh`: Usado para digitar um caractere Unicode, diretamente no seu valor em hexadecimal, `hhhh` deve ser 4 digitos hexadecimais.
+- `\OOO`: Usado para digitar um cactere em uma string, indicando uma sequência no sistema númerico octal, `OOO` deve ser números de `0` a `8`
+- `\xHH`: Usado para digitar um caractere ASCII, diretamente no seu valor em hexadecimal, `HH` deve ser 2 digitos hexadecimais.
+- `\xHHHH`: Usado para digitar um caractere Unicode, diretamente no seu valor em hexadecimal, `HHHH` deve ser 4 digitos hexadecimais.
 
 ## Tipos adicionais de caracteres
 Existem outros tipos adicionais de caracteres, sendo eles : 
