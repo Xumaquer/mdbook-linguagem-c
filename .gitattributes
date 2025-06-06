@@ -1,2 +1,4 @@
 *.md   text eol=lf
 *.toml text eol=lf
+*.css  text eol=crlf
+*.js   text eol=crlf

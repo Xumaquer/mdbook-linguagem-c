@@ -5,6 +5,10 @@ multilingual = false
 src = "src"
 title = "Linguagem C"
 
+[preprocessor.tabs]
+
 [output.html]
+additional-css = ["theme/tabs.css"]
+additional-js  = ["theme/tabs.js"]
 mathjax-support = true
 git-repository-url = "https://github.com/Xumaquer/mdbook-linguagem-c"
