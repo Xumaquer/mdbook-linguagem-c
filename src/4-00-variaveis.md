@@ -199,7 +199,7 @@ Na maioria dos casos, não há necessidade de declarar `signed` explicitamente, 
 > A única necessidade real de escrever `signed` é para utilização do tipo `signed char`.
 
 ### Unsigned
-Usada como modificador para declarar variáveis de tipos inteiros com sinal (ou seja, que não podem ter valores negativos).
+Usada como modificador para declarar variáveis de tipos inteiros sem sinal (ou seja, que não podem ter valores negativos).
 
 Inteiros sem sinal tem certas vantagens em relação aos tipos com sinal, no geral por não incluir valores negativos, os tipos sem sinal geralmente conseguem guardar valores até duas vezes maiores do que o valor máximo de uma variável com sinal de tamanho equivalente.
 

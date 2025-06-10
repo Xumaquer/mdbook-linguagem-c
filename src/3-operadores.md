@@ -49,6 +49,19 @@ Os operadores de atribuição também geram como "resultado", o valor atribuido,
     x = y = z = 20;
 ```
 
+## Operadores de Aritmética Unária
+Existem apenas dois operadores de aritmética unária que são `+` e `-`.
+
+Ao aplicar um dos operadores, temos a promoção de [tipos inteiros](./4-02-inteiros.md) menores do que `int` ou `unsigned int`, para os tipos `int` ou `unsigned int`.
+
+O operador `+` apenas realiza essa promoção, já o operador `-` inverte o sinal do valor e realiza a promoção : 
+```c
+short a = 50;
+a;  //O tipo dessa expressão é "short" e valor 50
++a; //O tipo dessa expressão é "int"   e valor 50
+-a; //O tipo dessa expressão é "int"   e valor -50
+```
+
 ## Operadores Aritméticos
 Os operadores aritméticos são utilizados para efetuar as quatro operações matemáticas básicas, junto da operação de resto de divisão, que está intimamente relacionada a divisão.
 

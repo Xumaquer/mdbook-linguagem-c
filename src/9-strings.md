@@ -40,6 +40,18 @@ int main()
 }
 ```
 
+Como strings são apenas "ponteiros para arrays" existem várias operações que podem ser feitas com elas : 
+```c
+#define ARRAY_SIZE(X) (sizeof(X)/sizeof(*X))
+
+"25" + 1    // "5" (avança um caractere)
+"comida"[3] // 'm' (pega o 4° caractere)
+*"abc"      // 'a' (pega o 1° caractere)
+[1]"BIFE"   // 'I' (pega o 2° caractere)
+
+//"World" (pula a frase "Hello ")
+"Hello World" + sizeof("Hello ") - 1 
+```
 
 ## Literais de strings
 Quando escrevemos uma string diretamente como no exemplo abaixo : 

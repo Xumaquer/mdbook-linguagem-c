@@ -227,6 +227,22 @@ Resultado inexato
 5 - Raiz de 2
 ```
 
+## Tipos extras de ponto flutuante
+Nos casos onde há uma FPU (Floating Point Unit), uma unidade dedicada para processamento de números de ponto flutuante dentro do processador, é possível que a precisão de certos tipos de ponto flutuante seja menor do que a precisão oferecida nativamente pelo hardware para realizar os cálculos.
+
+Nesses casos, utilizar os tipos de maior precisão suportados em hardware para realizar os cálculos é mais eficiente, além de, claro, ser mais preciso.
+
+Para isso, foram criadas novas definições de tipos de ponto flutuante na biblioteca `math.h`, aconselháveis para variáveis que guardem cálculos intermediários utilizados para produzir um valor final do tipo indicado : 
+
+- `float_t`, como o tipo mais eficiente que tem pelo menos o tamanho de `float`
+- `double_t`, como o tipo mais eficiente que tem pelo menos o tamanho de `double`
+
+Alguns detalhes adicionais sobre a implementação são evidenciados pelos diferentes valores da macro `FLT_EVAL_METHOD` : 
+- `0`: `float_t` e `double_t` são equivalentes a `float` e `double` respectivamente
+- `1`: `float_t` e `double_t` são equivalentes a `double`
+- `2`: `float_t` e `double_t` são equivalentes a `long double`
+- `outro`: o formato de `float_t` e `double_t` são definidos pela implementação
+
 ## Números complexos e imaginários
 Desde o `C99`, foram adicionados números complexos a linguagem, que devem ser, idealmente, acessados adicionando a biblioteca `complex.h`, pois algumas das funcionalidades dependem de macros do `complex.h` que podem incluir extensões de compilador (de forma que incluir `complex.h` seja a forma mais portável). 
 
