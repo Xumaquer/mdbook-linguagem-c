@@ -52,6 +52,8 @@ Os operadores de atribuição também geram como "resultado", o valor atribuido,
 ## Operadores de Aritmética Unária
 Existem apenas dois operadores de aritmética unária que são `+` e `-`.
 
+Para quem não sabe, unário indica que a operação ocorre com apenas um parâmetro, logo quando utilizamos `+x` ou `-x` estamos utilizando a operação unária, mas quando utilizamos `x+y` ou `x-y` estamos utilizando realizando outra operação (soma e subtração).
+
 Ao aplicar um dos operadores, temos a promoção de [tipos inteiros](./4-02-inteiros.md) menores do que `int` ou `unsigned int`, para os tipos `int` ou `unsigned int`.
 
 O operador `+` apenas realiza essa promoção, já o operador `-` inverte o sinal do valor e realiza a promoção : 
@@ -84,6 +86,13 @@ Acredito que os operadores aritméticos sejam bem intuitivos para quem já estud
     mul  = x * y; //x * y = 50
     div  = x / y; //x / y = 2
     rest = x % y; //x % y = 0 (não há resto)
+
+    7 % 5;  //tem resto 2
+    10 % 3; //tem resto 1
+
+    //não podemos dividir por 0, essa operação pode fazer qualquer coisa
+    //(até mesmo finalizar seu programa) 
+    x / 0; 
 ```  
 
 ## Operadores de Incremento/Decremento

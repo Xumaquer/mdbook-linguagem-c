@@ -186,7 +186,8 @@ Exemplo de uso para criar um array de strings e outro de inteiros :
 #include <stdlib.h>
 #include <stdio.h>
 
-//É relativamente comum utilizar um ponteiro NULL para indicar o "fim" de um array de strings
+//É relativamente comum utilizar um ponteiro NULL
+//para indicar o "fim" de um array de strings
 void escreveStrings(const char **strings)
 {
     while(*strings) { 
