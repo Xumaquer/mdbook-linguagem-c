@@ -73,6 +73,10 @@ int main()
 }
 ```
 
+Lembrando que o código acima funciona para processadores de arquiteturas ARM e x86  que tenham ordenação de bytes em little endian, porém, o mesmo sistema pode não funcionar em outras arquiteturas devido a forma como variáveis de ponto flutuante e `bitfields` são ordenados.
+
+Em sistemas linux é comum a presença do cabeçário [`iee754.h`](https://sites.uclouvain.be/SystInfo/usr/include/ieee754.h.html) que tenta tratar dessas diferenças com [diretivas de preprocessador](./11-00-preprocessador.md).
+
 ## Usos de uniões
 Existem algumas técnicas interessantes que podem ser feitas com `union`, essa seção busca compartilhar essas ideias para que você possa aplicar em seu código.
 

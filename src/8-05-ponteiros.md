@@ -189,7 +189,8 @@ x[array];
 *(x + array);
 
 //A ordem da soma não importa, portanto, funciona
-```  
+```
+
 ## Ponteiros para funções 
 Ponteiros de função guardam referências para funções e podem ser utilizados para chamá-las.
 

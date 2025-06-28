@@ -44,7 +44,7 @@ Exemplos de uso das diretivas :
 static char buffer[2048];
 size_t tam = recebeDados(sock,buffer, sizeof(buffer));
 
-//Gera um breakpoint caso receba menos 20 bytes
+//Gera um breakpoint caso receba mais do que 20 bytes
 DBG_ASSERT(tam >= 20); 
 ```
 

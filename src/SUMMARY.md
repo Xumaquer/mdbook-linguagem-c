@@ -25,4 +25,7 @@
   - [Inclusão de Arquivos](./11-03-inclusao-de-arquivos.md)
   - [Pragma](./11-04-pragma.md)
   - [Controle de Compilação](./11-05-controle-de-compilacao.md)
+- [Atributos (C23)](./12-atributos-c23.md)
 - [Apêndice](./x-00-apendice.md)
+  - [Números Binários](./x-01-numeros-binarios.md)
+  - [Números Hexadecimais](./x-02-numeros-hexadecimais.md)

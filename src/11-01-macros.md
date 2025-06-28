@@ -32,7 +32,7 @@ Devido a falta de algumas funcionalidades alto nível na linguagem, é normal qu
 
 A vantagem de utilizar macros é que podemos fazer coisas que normalmente não seriam possíveis utilizando apenas funções, a desvantagem, é que abrimos portas para que o programador possa implementar coisas realmente imprevisíveis, difíceis de testar, etc.
 
-É preferível utilizar funções normais quando elas suficientes, mas as funções macros tem seu espaço, o importante é saber utiliza-las de forma consciente, algo que programadores adquirem com experiência.
+É preferível utilizar funções normais quando elas são suficientes, mas as funções macros tem seu espaço, o importante é saber utiliza-las de forma consciente, algo que programadores adquirem com experiência.
 
 Para macros de múltiplas linhas é comum o uso de `do while(0)`, que pode inicialmente parecer estranho por ser um "loop que não se repete" mas é a única forma de garantir que a macro funcione em um `if` de uma linha : 
 

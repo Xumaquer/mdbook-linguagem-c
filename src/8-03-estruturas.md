@@ -393,3 +393,6 @@ Devido a regra de que os elementos de uma estrutura são colocados exatamente na
 Ao mesmo tempo, a estrutura `teste2` não precisa de alinhamento, pois os valores `a` e `c` estão seguidos um do outro na memória, formando, juntos, 4 bytes.
 
 Dessa forma `sizeof(struct teste1)` será 12 devido ao requisito de alinhamento, enquanto `sizeof(struct teste2)` será 8.
+
+## Offset de membros
+A biblioteca `stddef.h` (incluida junto com )

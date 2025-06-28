@@ -229,6 +229,13 @@ unsigned char teste2 = 0;
 
 //Neste caso, ocorre um underflow e o valor resulta em UCHAR_MAX
 teste2 -= 1;
+
+//Uma das armadilhas do C que muitos acabam caindo
+//Alguns assumiriam que "v2" resultaria em "-2"
+//PORÉM, a resposta certa é "2147483646" devido ao
+//underflow em (v1-8)
+unsigned int v1 = 4;
+int v2 = (v1-8)/2; 
 ```
 
 ## Modificadores de armazenamento
