@@ -28,14 +28,14 @@ Cada 4 digitos de um número binário equivalem exatamente a um digito hexadecim
 Isso é exemplificado na imagem abaixo, que como podem ver, leva a uma conversão extremamente simples : 
 ![](img/hex_to_binary.png)
 
-Onde o número `1100101011111110` vira `CAFE`.
+Onde o número `0b1100101011111110` vira `0xCAFE`.
 
 É comum essa conversão ser realizada mentalmente ao convertermos o número binário de 4 digitos para decimal e depois para hexadecimal.
 
-- `1100` é `12` em decimal, em hexadecimal `C = 12`, então `C`
-- `1010` é `10` em decimal, em hexadecimal `A = 10`, então `A`
-- `1111` é `15` em decimal, em hexadecimal `F = 15`, então `F`
-- `1110` é `14` em decimal, em hexadecimal `E = 14`, então `E`
+- `0b1100` é `12` em decimal, em hexadecimal `C = 12`, então `C`
+- `0b1010` é `10` em decimal, em hexadecimal `A = 10`, então `A`
+- `0b1111` é `15` em decimal, em hexadecimal `F = 15`, então `F`
+- `0b1110` é `14` em decimal, em hexadecimal `E = 14`, então `E`
 
 ## Conversão de hexadecimal para binário
 A conversão de hexadecimal para binário é similar a conversão reversa, podemos converter cada digito hexadecimal em 4 digitos binários.
@@ -44,17 +44,17 @@ A conversão envolve converter cada digito individualmente e depois juntar todos
 
 Por exemplo para conversão de `ABC` para binário teremos : 
 
-- `A` é `1010` em binário (`8+2`   = `10` (decimal) = `A`)
-- `B` é `1011` em binário (`8+2+1` = `11` (decimal) = `B`)
-- `C` é `1100` em binário (`8+4`   = `12` (decimal) = `C`)
+- `A` é `0b1010` em binário (`8+2`   = `10` (decimal) = `A`)
+- `B` é `0b1011` em binário (`8+2+1` = `11` (decimal) = `B`)
+- `C` é `0b1100` em binário (`8+4`   = `12` (decimal) = `C`)
 
-Logo o número resultante será a junção dos números `1010 1011 1100` (removendo os espaços), resultando em `101010111100`.
+Logo o número resultante será a junção dos números `1010 1011 1100` (removendo os espaços), resultando em `0b101010111100`.
 
 ## Conversão de hexadecimal para decimal
 Para convertermos um número em hexadecimal para decimal diretamente, podemos utilizar a `notação posicional`, seguindo as mesmas regras já explicadas no capítulo sobre [números binários](./x-01-numeros-binarios.md).
 
 
-Por exemplo para convertermos `DC` de hexadecimal para decimal : 
+Por exemplo para convertermos `0xDC` de hexadecimal para decimal : 
 ```c
 //A = 10, B = 11, C = 12
 //D = 13, E = 14, F = 15
@@ -66,9 +66,9 @@ Por exemplo para convertermos `DC` de hexadecimal para decimal :
 208+12 = 220
 ``` 
 
-Teremos que `DC` em hexadecimal é o número `220` em decimal.
+Teremos que `0xDC` em hexadecimal é o número `220` em decimal.
 
-Para conversão do número `FA8` em hexadecimal para decimal, teremos : 
+Para conversão do número `0xFA8` em hexadecimal para decimal, teremos : 
 ```c
 15 * (16^2) //15 * 256 = 3840
 10 * (16^1) //10 * 16  = 160
@@ -85,13 +85,13 @@ Outra forma é utilizar o método da divisão, da mesma forma que utilizamos par
 
 No exemplo abaixo temos a conversão do número `3564` para hexadecimal : 
 ```c
-3564 % 16 = C (3564/16 = 222)
-222  % 16 = E (222/16  = 13)
-13   % 16 = D (13/16   = 0)
+3564 % 16 = 0xC (3564/16 = 222)
+222  % 16 = 0xE (222/16  = 13)
+13   % 16 = 0xD (13/16   = 0)
 
 //Assim como no caso de números binários
 //precisamos ler o resultado de baixo para cima
 //Nesse caso ele resulta em : 
-DEC
+0xDEC
 ``` 
 

@@ -3,6 +3,12 @@ Toda informação num computador é composta por bits, a palavra bit é na verda
 
 Binário vem do número dois, "bi", indicando uma existência de apenas dois algarismos diferentes `0` e `1`.
 
+É importante lembrar que é comum utilizarmos os prefixos conforme listado no capítulo [sobre literais](./10-literais.md) para diferenciar os sistemas númericos :
+- `0b` para binário
+- `0`  para octal
+- Nenhum para decimal
+- `0x` para hexadecimal
+
 O sistema binário compartilha algumas características em comum com os sistemas númerico octal, decimal e hexadecimal:
 
 1. Existe um número limitado de símbolos usados para representar um algarismo
@@ -49,7 +55,7 @@ Uma forma interessante de pensar para lermos o valor de qualquer número, é que
 - `Tamanho` é a quantidade de símbolos que o sistema númerico tem (`2` para binário, `8` para octal, `10` para decimal, etc)
 - `Posição` é posição do algarismo da direita para esquerda, iniciando em `0`.
 
-Logo podemos decompor o número binário `101`na expressão `1*2^2 + 0*2^1 + 1*2^1` que usa números decimais para calcular seu valor.
+Logo podemos decompor o número binário `0b101`na expressão `1*2^2 + 0*2^1 + 1*2^1` que usa números decimais para calcular seu valor.
 
 Chamamos essa forma de `notação posicional`.
 
@@ -58,15 +64,15 @@ Como números binários só tem 2 algarismos, podemos simplificar um pouco o pen
 
 A técnica utilizada continua sendo a de pegar cada algarismo e avaliar seu valor usando a `notação posicional`, porém como só temos dois valores possíveis (`0` ou `1`), podemos facilitar a conversão escrevendo previamente o resultado das potências de dois.
 
-Considere a conversão do número binário `101101` para decimal :  
+Considere a conversão do número binário `0b101101` para decimal :  
 ```c
 4096 2048 1024 512 256 128 64 32 16 8 4 2 1 //Potências de dois em decimal
                                1  0 1 1 0 1 //Número binário
 ```
 
-Todos os algarismos em `1` representam números decimais que serão adicionados no cálculo, logo `101101` é `32 + 8 + 4 + 1` que resulta em `45`.
+Todos os algarismos em `1` representam números decimais que serão adicionados no cálculo, logo `0b101101` é `32 + 8 + 4 + 1` que resulta em `45`.
 
-Podemos aplicar a mesma lógica para números maiores como `11010101` : 
+Podemos aplicar a mesma lógica para números maiores como `0b11010101` : 
 ```c
 4096 2048 1024 512 256 128 64 32 16 8 4 2 1 //Potências de dois em decimal
                          1  1  0  1 0 1 0 1 //Número binário
@@ -126,8 +132,8 @@ Por exemplo, para convertermos o número `56` para binário (usaremos `%` como o
 //Agora precisamos ler os resultados dos restos de baixo para cima
 //resultando em 111000
 
-56     //Decimal
-111000 //Binário
+56       //Decimal
+0b111000 //Binário
 ```
 
 Agora vamos converter um número maior, `9872` : 
@@ -149,6 +155,6 @@ Agora vamos converter um número maior, `9872` :
 1    % 2 = 1 (1/2    = 0)
 
 //De forma que 
-9872           //Decimal
-10011010010000 //Binário
+9872             //Decimal
+0b10011010010000 //Binário
 ```
