@@ -55,7 +55,9 @@ Uma forma interessante de pensar para lermos o valor de qualquer número, é que
 - `Tamanho` é a quantidade de símbolos que o sistema númerico tem (`2` para binário, `8` para octal, `10` para decimal, etc)
 - `Posição` é posição do algarismo da direita para esquerda, iniciando em `0`.
 
-Logo podemos decompor o número binário `0b101`na expressão `1*2^2 + 0*2^1 + 1*2^1` que usa números decimais para calcular seu valor.
+A mesma regra se aplicar a números decimais, por exemplo, no número `342`, podemos decompor ele como `3*10^2 + 4*10^1 + 2*10^0` que seria `300 + 40 + 2`, resultando em `342`.
+
+Logo podemos decompor o número binário `0b101`na expressão `1*2^2 + 0*2^1 + 1*2^0`, que pode ser decomposto em `4 + 0 + 1` resultando em `5`.
 
 Chamamos essa forma de `notação posicional`.
 

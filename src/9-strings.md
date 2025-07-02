@@ -19,7 +19,7 @@ Será na prática, um array que contenha :
 'H' 'e' 'l' 'l' 'o' ' ' 'W' 'o' 'r' 'l' 'd' '\n' '\0'
 ```
 
-Dessa forma, poderiamos fazer um código que "descobre" o tamanho de uma string, lembrando que na prática utiliizar a função `strlen` da biblioteca `string.h` é absurdamente mais otimizado: 
+Dessa forma, poderiamos fazer um código que "descobre" o tamanho de uma string, lembrando que na prática a função `strlen` da biblioteca `string.h` é muito mais otimizada: 
 ```c
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,15 +40,14 @@ int main()
 }
 ```
 
-Como strings são apenas "ponteiros para arrays" existem várias operações que podem ser feitas com elas : 
+Como strings são apenas "ponteiros para arrays" existem várias operações que podem ser realizadas com elas : 
 ```c
-#define ARRAY_SIZE(X) (sizeof(X)/sizeof(*X))
-
 "25" + 1    // "5" (avança um caractere)
 "comida"[3] // 'm' (pega o 4° caractere)
 *"abc"      // 'a' (pega o 1° caractere)
 [1]"BIFE"   // 'I' (pega o 2° caractere)
 
+//Descontamos 1 por causa do \0 em "Hello "
 //"World" (pula a frase "Hello ")
 "Hello World" + sizeof("Hello ") - 1 
 ```

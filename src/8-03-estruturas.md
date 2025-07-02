@@ -331,7 +331,9 @@ O padrão do C apenas especifica que bytes extras podem ser adicionados por ques
 
 Para quem não sabe, ABI é uma sigla para "Application Binary Interface" e especifica a forma em comum que diferentes programas devem se comunicar em uma mesma plataforma, geralmente especificando convenções de chamada, requisitos de alinhamento e vários outros detalhes.
 
-A forma mais precisa e efetiva de descobrir como exatamente o alinhamento é lidado, é ler documentos que especificam esse comportamento, como por exemplo : 
+Lembrando que a ordem dos bit fields, apesar de definido pela implementação, geralmente acaba sendo definido pelas regras de ABI da arquitetura, arquiteturas ARM e x86 geralmente é da direita para esquerda, sendo a representação mais "comum".
+
+A forma mais precisa e efetiva de descobrir como exatamente o alinhamento e bitfields são lidados, é ler documentos que especificam esse comportamento, como por exemplo : 
 - [`ABI x86-64 Windows`](https://learn.microsoft.com/pt-br/cpp/build/x64-software-conventions?view=msvc-170)
 - [`ABI x86-64 SystemV`](https://gitlab.com/x86-psABIs/x86-64-ABI)
 - [`ABI ARM Windows`](https://learn.microsoft.com/pt-br/cpp/build/overview-of-arm-abi-conventions?view=msvc-170#alignment)
@@ -395,4 +397,24 @@ Ao mesmo tempo, a estrutura `teste2` não precisa de alinhamento, pois os valore
 Dessa forma `sizeof(struct teste1)` será 12 devido ao requisito de alinhamento, enquanto `sizeof(struct teste2)` será 8.
 
 ## Offset de membros
-A biblioteca `stddef.h` (incluida junto com )
+A biblioteca `stddef.h` (incluida junto com `stdlib.h`) inclui a macro `offsetof`, que pode ser utilizada para calcular o offset em bytes de um membro de uma estrutura.
+
+Exemplo de uso:
+
+```c
+#include <stddef.h>
+
+struct Test1 {
+    int  v1;
+    char v2;
+    short v3;
+};
+
+//valor do offset, terá (sizeof(int))
+offsetof(struct Test1, v2);
+
+//valor do offset
+// terá (sizeof(int) + sizeof(char))
+//junto de um possível offset usado para alinhar
+offsetof(struct Teste1, v3);
+```
