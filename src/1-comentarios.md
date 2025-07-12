@@ -1,11 +1,10 @@
 # Comentários
 
-Em qualquer linguagem de programação, comentários são uma porção de texto, marcada de alguma forma, para que ela seja ignorada pelo compilador ou interpretador.
+Em qualquer linguagem de programação, comentários são trechos de texto marcados de forma que sejam ignorados pelo compilador ou interpretador.
 
-Na linguagem C, comentários de uma linha são feitos utilizando `//`.
+Na linguagem C, comentários de uma linha são feitos utilizando `//`, esse estilo de comentário foi adicionado no `C99` e antes disso apenas comentários de bloco eram aceitos pela linguagem.
 
-Comentários assim são ideais para descrições rápidas, geralmente ao lado ou logo acima do que se deseja descrever, o ideal é que eles sejam 
-usados para descrever algo que precisa de descrição ou  justificar algo fora do comum.
+Esse tipo de comentário é ideal para descrições rápidas, geralmente ao lado ou logo acima do trecho de código que se deseja explicar. O ideal é utilizá-los para descrever algo que precise de esclarecimento ou justificava.
 
 ```c
 double c = 299792458; //Velocidade da luz (m/s)
@@ -14,9 +13,9 @@ double c = 299792458; //Velocidade da luz (m/s)
 char *dados = mapearArquivoEmMemoria("teste.txt");
 ```
 
-Já comentários em bloco, em multiplas linhas, são realizados iniciando um bloco com `/*` e finalizando com `*/`.
+Comentários em várias linhas, também chamados de comentários em bloco, são iniciados com `/*` e finalizados com `*/`.
 
-Blocos de comentários são geralmente utilizados para descrever funções ou realizar explicações grandes antes de algo que precisa de uma justificativa maior.
+Eles geralmente são utilizados para explicar funções, trechos de código mais complexos ou realizar justificativas mais detalhadas.
 
 ```c
 /*

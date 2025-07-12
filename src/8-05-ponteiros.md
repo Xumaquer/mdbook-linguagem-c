@@ -355,6 +355,22 @@ char *d = (char*)&c;
 *d = 10;
 ```
 
+Fazer um cast do ponteiro de uma `struct` para o tipo do primeiro membro não viola o `strict aliasing`, esse mecanismo é normalmente utilizado para implementar o conceito de herança da programação orientada a objetos em C : 
+```c
+struct Animal {
+    int altura;
+    int idade;
+};
+
+struct Gato {
+    struct Animal base;
+    int raca; //Imagine que é um enum com a raça do gato
+};
+
+struct Gato gato;
+(struct Animal*)&gato; //Essa conversão é permitida
+```
+
 A ideia inicial dessa regra foi permitir uma otimização que posteriormente poderia ser habilitada manualmente com a palavra chave `restrict` : 
 ```c
 //Como "int" e "double" são tipos diferentes
