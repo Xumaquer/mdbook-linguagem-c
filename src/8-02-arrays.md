@@ -144,7 +144,7 @@ Desde o `C99`, quando inicializamos um array com um valor que não é uma expres
 
 Os arrays de tamanho variável normalmente são chamados de VLA, uma sigla do seu nome em inglês "Variable Length Array".
 
-Eles funcionam de forma similar a variáveis locais com o modificador `const`, o tamanho do array é sempre redefinido ao executar a linha que o declara porém seu tamanho não muda no período entre sua criação e destruição.
+O tamanho de um array de tamanho variável funciona de forma similar ao valor de variáveis locais com o modificador `const`, o tamanho do array é sempre redefinido ao executar a linha que o declara porém seu tamanho não muda no período entre sua criação e destruição.
 
 Assim como arrays de tamanho constante, arrays de tamanho variável também não podem ter tamanho 0, portanto é importante sempre checar e evitar que o número utilizado para inicializar ele seja um número inteiro com valor maior ou igual a 1.
 
@@ -220,7 +220,7 @@ Você deve estar se perguntando "por que o C faz isso?", a resposta é que passa
 
 Apesar de existirem alguns casos onde arrays pequenos poderiam ser copiados de forma eficiente, o decaimento para ponteiros impede isso, a resposta nestes casos é fazer uma estrutura que inclua o array, pois estruturas podem ser copiadas, mesmo se incluirem um array dentro delas.
 
-Um uso interessante de arrays como parâmetro é quando usamos em conjunto do modificador `static`, ao utilizar o operador `static` dentro dos colchetes `[]` seguido de um tamanho, obrigamos o ponteiro recebido a ter "pelo menos" o tamanho especificado.
+Um uso interessante de arrays como parâmetro é quando usamos em conjunto do modificador `static`, ao utilizar o operador `static` dentro dos colchetes `[]` seguido de um tamanho, obrigamos o array recebido via ponteiro a ter "pelo menos" o tamanho especificado, porém `sizeof` continua resultando no tamanho de um ponteiro.
 
 Ao utilizarmos `static` podemos permitir que o compilador de C realize otimizações adicionais que normalmente não seriam possíveis sem essa garantia ou gerar avisos quando passamos um array que tem tamanho menor do que o definido.
 

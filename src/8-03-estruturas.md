@@ -129,7 +129,7 @@ struct ArquivoMapeado {
     size_t tamanho; /* Tamanho do arquivo */
 };
 
-struct ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho)
+ArquivoMapeado *mapearArquivoEmMemoria(const char *caminho)
 {
     
     HANDLE arquivo = CreateFileA(caminho, GENERIC_READ | GENERIC_WRITE,
