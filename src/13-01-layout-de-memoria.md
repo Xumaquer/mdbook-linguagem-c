@@ -110,7 +110,7 @@ As inicializações de variáveis globais geralmente são realizadas por uma das
 
 2. Uma região com variáveis inicializadas é preparada reservando memória para a região e copiando o conteúdo no arquivo executável ou memória flash/magnética para essa região.
 
-## Segmento de memória - Stack
+## Stack
 Cada thread tem uma região de memória reservada como "Stack", que no português seria uma "Pilha", utilizada para variáveis locais, de [`duração automática`](./4-00-variaveis.md#modificadores-de-armazenamento).
 
 Pilhas normalmente funcionam como uma lista no formato LIFO (Last In, First Out) que no português seria "Último a entrar, primeiro a sair", onde variáveis são empilhadas no topo e posteriormente removidas.
@@ -143,13 +143,18 @@ Toda memória da heap deve ser acessada indiretamente via ponteiro, pois não h�
 
 No linux, por exemplo, é comum que as regiões `.bss`, `.data` e a heap, façam parte do segmento `data`, que compoem um segmento com permissões de leitura e escrita.
 
-A função padrão do C para alocação, `malloc` é implementada pela GLIBC (biblioteca padrão do C pelo projeto GNU) no linux de duas formas dependendo do tamanho da alocação :
+A função padrão do C para alocação, `malloc` é implementada pela GLIBC (biblioteca padrão do C pelo projeto GNU) no linux usando duas funções do sistema dependendo do tamanho da alocação :
 
-- Para alocações menores que 128KB, utiliza-se a função de sistema [`brk`](https://man7.org/linux/man-pages/man2/brk.2.html), que modifica onde é o fim do segmento `data`, o que acaba por alocar ou desalocar memória, utilizar essa função manualmente pode causar conflito com `malloc`, portanto recomenda-se evitar seu uso.
+- Para alocações menores que 128KB, utiliza-se a função de sistema [`brk`](https://man7.org/linux/man-pages/man2/brk.2.html), que modifica onde é o fim do segmento `data`, o que acaba por alocar ou desalocar memória, utilizar essa função manualmente pode causar conflito com `malloc`, portanto recomenda-se evitar seu uso por código do usuário.
 - Para alocações maiores que 128kb, a GLIBC utiliza a função [`mmap`](https://man7.org/linux/man-pages/man2/mmap.2.html), que mapeia uma nova região de memória separada do segmento `data`, mas que funciona de forma independente, e pode ser desalocada de forma individual.
 
+A vantagem de `brk` sobre `mmap` é que ela é mais rápida, porém vem com diversas desvantagens:
+- As alocações "expandem" o segmento `data`, se houver outra coisa mapeada no caminho que impeça o segmento de crescer, `mmap` se tornará a única forma de alocar memória
+- Ela não é amigável para código multithread, pois toda alocação de memória deve ser gerenciada de forma unificada
+- A necessidade de unificar o gerenciamento de memória dificulta a presença de outros alocadores e pode conflitar com outras bibliotecas
+
 ## Bibliotecas de Vínculo Dinâmico
-Existem algumas bibliotecas especiais chamadas de bibliotecas de vínculo dinâmica, são arquivos efetivamente arquivos executáveis "especiais", que podem ser embarcados e carregados em outros executáveis.
+Existem algumas bibliotecas especiais chamadas de bibliotecas de vínculo dinâmica, são efetivamente arquivos executáveis "especiais", que podem ser carregados para dentro de outros executáveis.
 
 O formato de arquivo utilizado em cada uma dessas bibliotecas, ainda é o mesmo formato utilizado por executáveis na mesma plataforma, porém com valores diferentes nos cabeçários do arquivo.
 
@@ -162,7 +167,7 @@ As bibliotecas de vínculo dinâmico geralmente podem ser carregadas de uma das 
 - Adicionando a função na tabela de importação no cabeçário do executável (torna a biblioteca uma depedência para que o executável funcione)
 - Carregando a biblioteca durante tempo de execução utilizando alguma função do sistema operacional
 
-Em alguns casos, existem bibliotecas estáticas, que podem ser linkadas junto com o executável, que já adicionam os dados necessários na tabela de importação do executável, simplificando o processo de importar as bibliotecas.
+Em alguns casos, existem bibliotecas estáticas, que podem ser vinculadas junto com o executável, que já adicionam os dados necessários na tabela de importação do executável, simplificando o processo de importar as bibliotecas.
 
 Adicionar funções na tabela de importação pode não ser uma boa idéia se não houver uma garantia maior de que a biblioteca existe, pois uma falha em carregar a biblioteca resultará em uma falha em executar o programa.
 
@@ -177,6 +182,28 @@ Nesses casos, carregar a biblitoeca durante tempo de execução pode ser uma op�
 Uma das grandes "vantagens" de bibliotecas de vínculo dinâmico, é que múltiplos processos podem "reutilizar" a mesma biblioteca, minimizando o uso de memória e evitando a presença de múltiplas cópias "do mesmo código". 
 
 É muito comum que a biblioteca padrão do C seja distribuida como uma biblioteca de vínculo dinâmico, o que permite que ela seja atualizada e vulnerabilidades nela sejam corrigidas, sem exigir uma recompilação de todos os programas do sistema inteiro.
+
+### Bibliotecas dinâmicas na memória
+As bibliotecas dinâmicas fazem parte do layout da memória da maioria dos processos em um sistema operacional moderno, como cada uma delas é um executável embarcado, cada biblioteca tem suas próprias seções de memória.
+
+Na figura abaixo, retirada do programa [`x64Dbg`](https://x64dbg.com/) (debugger e patcher de assembly para engenharia reversa), podemos ver as seções de memória de algumas DLLs carregadas em um processo : 
+
+![](./img/x64dbg_sections.png)
+
+### Tabela de importação
+Para os casos onde as bibliotecas de vínculo dinâmico são carregadas durante a inicialização do programa, elas precisam ser referenciadas na tabela de importação do executável.
+
+A tabela de importação contém uma lista com os nomes das bibliotecas e os nomes das funções que devem ser importadas, bem como uma lista de endereços que serão preenchidos pelo sistema operacional com os endereços das funções carregadas.
+
+Não há garantia quanto ao endereço em que uma biblioteca dinâmica será carregada muito menos que ela continue com o mesmo tamanho em versões posteriores. 
+
+Portanto, as funções de bibliotecas dinâmicas precisam ser chamadas de forma indireta, utilizando os ponteiros de função preenchidos na tabela de importação, tudo isso é feito de forma transparente para o programador em C.
+
+A imagem abaixo demonstra algumas funções importadas de bibliotecas dinâmicas em um executável visualizadas no [`x64Dbg`](https://x64dbg.com/):
+
+![](./img/x64dbg_imports.png)
+
+Os endereços a esquerda são os endereços base de cada módulo, enquanto os endereços a direita são os endereços de cada ponteiro de função que referencia uma função importada.
 
 ## Visão Geral
 Podemos dizer que no geral, um programa geralmente tem uma stack, heap e as regiões `.bss`, `.data`, `.text` e alguma das regiões para constantes globais.
