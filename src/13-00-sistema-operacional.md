@@ -16,6 +16,10 @@ Solicitações para que o kernel realize tarefas, são denominadas de "chamadas 
 - Notificações de erros de sistema
 - Configuração e definição de permissões de arquivos e pastas
 
+Dispositivos de entrada e saída (abreviados como I/O em inglês), são geralmente conectados ao barramento de endereços e podem ser controlados ao ler e escrever em endereços específicos.
+
+Isso significa que as mesmas instruções utilizadas para ler e escrever em variáveis na memória, são também utilizadas para comunicar com dispositivos externos como placa de som, HDs, teclado, mouse, etc. Quem faz esse acesso é, no geral, o kernel ou uma aplicação bare metal. 
+
 Sistemas operacionais são uma junção do kernel com softwares adicionais que fornecem um ambiente mais amigável para o usuário, fornecendo coisas como : 
 - Terminal
 - Ambiente de área de trabalho com interface gráfica

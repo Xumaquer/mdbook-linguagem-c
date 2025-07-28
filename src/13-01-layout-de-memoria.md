@@ -40,6 +40,7 @@ Uma única linha de código de C pode se tornar várias instruções da máquina
 - Chamar funções
 - Checar condições
 - Realizar cálculos aritméticos
+- Chamar uma interrupção de software (chamada de sistema, breakpoint, etc)
 
 A quantidade de bytes e quais valores são necessários para indicar cada comando, depende da arquitetura do processador.
 
@@ -154,7 +155,7 @@ A vantagem de `brk` sobre `mmap` é que ela é mais rápida, porém vem com dive
 - A necessidade de unificar o gerenciamento de memória dificulta a presença de outros alocadores e pode conflitar com outras bibliotecas
 
 ## Bibliotecas de Vínculo Dinâmico
-Existem algumas bibliotecas especiais chamadas de bibliotecas de vínculo dinâmica, são efetivamente arquivos executáveis "especiais", que podem ser carregados para dentro de outros executáveis.
+Existem algumas bibliotecas especiais chamadas de bibliotecas de vínculo dinâmico, são efetivamente arquivos executáveis "especiais", que podem ser carregados para dentro de outros executáveis.
 
 O formato de arquivo utilizado em cada uma dessas bibliotecas, ainda é o mesmo formato utilizado por executáveis na mesma plataforma, porém com valores diferentes nos cabeçários do arquivo.
 
