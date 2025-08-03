@@ -98,7 +98,9 @@ O exemplo mais comum desse padrão sendo aplicado na prática é o próprio tipo
 
 Esse padrão normalmente é aplicado ao definir em um arquivo de cabeçário, o protótipo de funções que operam com um ponteiro da estrutura, sem declarar efetivamente a estrutura, a mantendo como um tipo incompleto. Enquanto, ao mesmo tempo, define um arquivo que implementa e define as funções e a estrutura.
 
-Exemplo abaixo do uso do padrão "pimpl" para mapear um arquivo em memória no windows:
+<details>
+  <summary>Exemplo do uso do padrão "pimpl" para mapear um arquivo em memória no windows</summary>
+
 ```c
 //Código do .h (cabeçário)
 #ifndef ARQUIVO_MAPEADO_H
@@ -183,8 +185,11 @@ void fecharArquivoMapeado(ArquivoMapeado *mapa)
     free(mapa);
 }
 ```
-
 No caso descrito acima, poderiamos implementar outra versão do arquivo `.c` que funcione para linux sem a necessidade de mudarmos o código que chama essas funções, oferecendo uma flexibilidade e facilidade para tornar o código portável.
+
+</details>
+
+
 
 ## Membro de array flexível
 Desde o `C99`, a definição de uma estrutura pode incluir como seu último membro um campo de array "incompleto", onde o tamanho não é especificado.

@@ -214,7 +214,37 @@ size_t strlcat(char *dest, const char *src, size_t size)
 
 Para versão wide, podemos checar se as funções `wcslcpy` ou `wcslcat` existem, caso contrário podemos utilizar as implementações sugeridas, trocando os tipos `char` por `wchar_t` e a variável `len` no `memcpy` por `len * sizeof(wchar_t)`.
 
-### Diferentes representações de String
+## Iteração com strings
+É comum que iniciantes que vieram de outras linguagens de alto nível iterem sobre strings de forma ineficiente em C.
+
+Uma implementação que normalmente podemos ver é : 
+```c
+for(int i = 0; i < strlen(str); i++) {
+    str[i]; //Caractere
+}
+```
+
+Observe que a função `strlen` é chamada a cada iteração, isso é extremamente ineficiente, pois cada chamada de `strlen` itera a string inteira até achar o caractere `\0` que é o finalizador.
+
+Em linguagens alto nível é comum que string seja uma classe que já contêm o tamanho como uma de suas propriedades, tornando essa operação eficiente, o que não é o caso com as strings padrão do C.
+
+Uma forma muito mais simples e muito mais eficiente de iterar sobre strings em C : 
+```c
+for(const char *c = str; *c; c++) {
+    *c; //Caractere
+}
+```
+
+Nesse caso temos um ponteiro que acessa cada caractere, avançando uma posição a cada iteração e que para quando chega no caractere `\0` (`*c` é `Falso` quando chega no valor `\0`).
+
+Também podemos implementar de forma similar, utilizando indices : 
+```c
+for(int i = 0; str[i]; i++) {
+    str[i]; //Caractere
+}
+```
+
+## Diferentes representações de String
 Neste campo vamos falar sobre algo um pouco avançado, as diferentes implementações para representar strings em várias linguagens, incluindo C e até mesmo bibliotecas renomadas que buscam algo mais eficiente, destacando os pontos positivos e negativos de cada formato.
 
 Alguns termos, que precisam de explicação, serão reutilizados ao longo das explicações : 

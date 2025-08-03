@@ -6,7 +6,7 @@ A linguagem C fornece, através da sua biblioteca padrão e expõe pelo header `
 Quando alocamos memória, estamos efetivamente reservando uma quantidade específica de bytes para algum uso específico.
 
 ## Funções para alocação
-Para realizar a alocação de memória, existem 3 funções da biblioteca padrão.
+Para realizar a alocação de memória, existem 3 funções da biblioteca padrão: `malloc`, `calloc` e `aligned_alloc`.
 
 ### malloc
 `malloc` é a principal função para alocação de memória, e tem a seguinte sintaxe : 
@@ -117,7 +117,7 @@ if(novoPtr != NULL) {
 ```
 
 ## Funções para liberar memória
-Para liberar o uso de memória, existem 3 funções diferentes.
+Para liberar o uso de memória e permitir que novas alocações ou outros programas no sistema utilizem a memória, existem 3 funções diferentes: `free`, `free_sized` e `free_aligned_sized`.
 
 ### free
 `free` é a principal função para liberar o uso de memória pelas funções de alocação e realocação, até o `C23` era a única função para tal.
@@ -150,7 +150,7 @@ No `C23`, a função `free_sized` foi adicionada como uma forma adicional de lib
 
 A função apresenta um parâmetro extra especificando o tamanho da alocação original : 
 ```c
-    void free_sized(void *ptr, size_t tamanho);
+void free_sized(void *ptr, size_t tamanho);
 ```
 
 Onde `tamanho` seria o tamanho utilizado para previamente realizar a alocação.
@@ -226,7 +226,7 @@ Por isso, é bom evidenciarmos os problemas que podem acontecer, as possíveis c
 Um vazamento de memória ocorre quando perdemos o valor do ponteiro de uma região de memória previamente alocada, de forma que não seja mais possível liberar a memória.
 
 Possíveis causas : 
-- Alocar uma `struct` que guarda ponteiros para outras alocações e esquecer de desalocar a memória deles antes de desalocar a estrutura
+- Alocar uma `struct` que guarda ponteiros para outras alocações e esquecer de desalocar a memória deles antes de desalocar a `struct`
 - Sobrescrever um ponteiro de uma alocação antiga com um ponteiro de uma alocação nova, sem que a região antiga tenha sido liberada.
 - Uso incorreto de `realloc` (esquecendo de manter o ponteiro em outra variável, como listado anteriormente)
 - Utilizar funções de bibliotecas externas de maneira incorreta, sem respeitar as recomendações da documentação
@@ -290,7 +290,7 @@ Quanto as implicações da estratégias utilizadas pelas linguagens:
 Em sistemas embarcados, é normalmente desaconselhado o uso de memória dinâmica por vários motivos : 
 - Mal uso de alocação dinâmica é uma grande causa de vários erros, erros que muitas vezes não deveriam ocorrer nunca em sistemas embarcados que desempenham tarefas críticas
 - O tempo para execução de `malloc`, `free` e similares não é deterministico, que podem ter um impacto significativo na performance e afetar o tempo de tarefas críticas
-- É comum que apenas um programa seja executado num sistema embarcado, não existe outros programas competindo pela memória disponível
+- É comum que apenas um programa seja executado num sistema embarcado, não exista outros programas competindo pela memória disponível
 - Usar apenas memória estática (com variáveis globais ou `static` em funções), simplifica a detecção e análise de problemas relacionados ao uso de memória
 
 Algumas dessas regras e outras relacionadas ao desenvolvimento de código crítico para embarcados em C pode ser visto nos documentos da [`NASA`](https://www.cs.otago.ac.nz/cosc345/resources/nasa-10-rules.pdf) e [`MISRA C`](https://www.mathworks.com/help/bugfinder/misra-c-2023-reference.html?s_tid=CRUX_lftnav).
@@ -316,7 +316,7 @@ A vantagem do alocador arena é que ele é muito mais eficiente e a alocação d
 
 Porém, o alocador arena é obrigado a desalocar começando pelos últimos elementos alocados, seguindo a ordem de LIFO exatamente igual a uma pilha.
 
-Utilizar um alocador arena também pode ser benéfico para diminuir a complexidade ao gerenciar memória manualmente, ao invés de gerenciar múltiplas alocações individuais, é mais simples realizar múltiplas deslocações de uma vez em um único ponto.
+Utilizar um alocador arena também pode ser benéfico para diminuir a complexidade ao gerenciar memória manualmente, ao invés de gerenciar múltiplas alocações individuais, é mais simples realizar múltiplas desalocações de uma vez em um único ponto.
 
 É possível implementar um alocador arena utilizando `malloc` e `free`, mas é muito mais eficiente utilizar [`mmap`](https://man7.org/linux/man-pages/man2/mmap.2.html) no linux/macOs, [`VirtualAlloc`](https://learn.microsoft.com/pt-br/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc) no windows ou até mesmo uma função própria de alocação de algum outro sistema.
 
@@ -378,11 +378,24 @@ void *arena_push(struct Arena *arena, size_t size)
 {
     size_t rem_size = arena->commited - arena->size;
     if(rem_size < size && !arena_commit(arena, size - rem_size))
-        return NULL; //Commit failed 
+        return NULL; //Falha ao extender a região
     
     void *addr = (char*)arena->base + arena->size;
     arena->size += size;
     return addr;
+}
+
+void arena_pop(struct Arena *arena, size_t size)
+{
+    if(size <= arena->size)
+        arena->size -= size;
+    else
+        arena->size = 0;
+}
+
+void arena_clear(struct Arena *arena)
+{
+    arena->size = 0;
 }
 
 void arena_free(struct Arena *arena)
@@ -393,6 +406,10 @@ void arena_free(struct Arena *arena)
     }
 }
 ```
+
+Veja que, ao alocar memória sem especificar a proteção de memória, estamos efetivamente apenas reservando espaço no endereçamento virtual do processo. 
+
+A função [`mprotect`](https://man7.org/linux/man-pages/man2/mprotect.2.html) permite modificar a proteção de memória e introduzir permissões de leitura/escrita, o que permite que a página seja acessada e posteriormente adicionada pelo sistema operacional.
 </details>
 
 
