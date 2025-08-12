@@ -178,4 +178,4 @@ Muitos cursos de C ensinam a limpar a tela do terminal utilizando `system("cls")
 
 Utilizar as sequências de escape garante uma compatibilidade com mais sistemas operacionais, maior performance, além de permitir que os comandos sejam embarcados em arquivos e acionados ao escrevê-los no terminal.
 
-Para utilizar a maioria das sequências de escape suportadas no Windows, Linux e macOs, podemos utilizar uma biblioteca própria feita pelo autor deste guia denominada [`vt100.h`](./libs/vt100.h).
+Para utilizar a maioria das sequências de escape suportadas no Windows, Linux e macOs, podemos utilizar uma biblioteca própria feita pelo autor deste guia denominada <a href="./libs/vt100.h" download>vt100.h</a>.
