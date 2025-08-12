@@ -32,3 +32,4 @@
 - [Apêndice](./x-00-apendice.md)
   - [Números Binários](./x-01-numeros-binarios.md)
   - [Números Hexadecimais](./x-02-numeros-hexadecimais.md)
+  - [Terminais](./x-03-terminal.md)
