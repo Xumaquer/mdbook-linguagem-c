@@ -41,14 +41,18 @@ int main()
 {
     //Campos são preenchidos na mesma ordem da estrutura
     //e se não forem preenchidos, terão o valor 0
+
+    //Inicialização comum
     struct Pessoa pessoa1 = {"Joao", "123.456.789-10", 25};
     
+    //Utilizando inicializadores designados
     struct Pessoa pessoa2 = {
         .nome = "Lucia",
         .cpf  = "987.173.762-28",
         .idade = 22
     };
 
+    //Atribuindo valores a uma estrutura não inicializada
     struct Pessoa pessoa3;
     strcpy(pessoa3.nome, "Carlos");
     strcpy(pessoa3.cpf,  "982.238.372-59");

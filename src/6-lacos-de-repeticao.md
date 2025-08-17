@@ -1,5 +1,5 @@
 # Laços de repetição
-Laços de repetição são formas de controlar o fluxo de execução, de forma que uma parcela de código possa ser executada novamente.
+Laços de repetição são formas de controlar o fluxo de execução, de forma que uma parcela de código possa ser executada novamente, é muito comum que as pessoas se refiram a eles pelo nome inglês "loop".
 
 Ao aliar laços de repetição com a modificação de variaveis, podemos efetivamente ter um comportamento diferente mesmo repetindo os mesmos comandos.
 

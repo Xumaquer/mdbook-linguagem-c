@@ -196,7 +196,7 @@ if_empty(STATUS_NOT_FOUND) //404 NOT FOUND
 }
 ```
 
-Além disso, similar ao `__has_include`, também podemos utilizar `__has_embed` em diretivas `#if` ou `#elif` para verificar se um recurso é embarcável com `#embed`, a diferença é que ap invés de `0` ou `1`, o `#embed` resulta em um entre três valores : 
+Além disso, similar ao `__has_include`, também podemos utilizar `__has_embed` em diretivas `#if` ou `#elif` para verificar se um recurso é embarcável com `#embed`, a diferença é que ao invés de `0` ou `1`, o `#embed` resulta em um entre três valores : 
 - `__STDC_EMBED_NOT_FOUND__`: Arquivo não encontrado
 - `__STDC_EMBED_EMPTY__`: Arquivo vazio
 - `__STDC_EMBED_FOUND__`: Arquivo encontrado e com conteúdo

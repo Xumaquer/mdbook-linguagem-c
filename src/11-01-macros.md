@@ -91,10 +91,10 @@ float test3 = MATH_MAX_2(sqrtf(2), pow(1.19,2));
 ```
 
 Fica a dica : 
-- Sempre certifique-se de botar parenteses pois isso garante um funcionamento adequado das macros para qualquer entrada 
+- Sempre certifique-se de botar parenteses nos parâmetros pois isso garante um funcionamento adequado das macros para qualquer entrada 
 - Evite usar funções como parâmetros em macros, ou certifique-se de documentar quando o usuário pode utilizá-las ou deve evitá-las com a sua macro
 - Se for fazer uma função macro, certifique-se que ela se comporta como uma chamada de função, utilizando `do while(0)` caso necessário (evitando imprevisibilidades)
-- Sempre que pensar em fazer uma função-macro, pense bem se essa solução é viável e se não existe outra forma melhor
+- Tenha preferência a funções sobre funções macro
 
 ## Macros com argumentos variádicos
 Desde o `C99` podemos utilizar argumentos variádicos em macros, de forma similar aos argumentos variádicos em funções.
@@ -189,6 +189,8 @@ O uso é muito simples, basta utilizar `#undef NOME_MACRO` e ela será removida.
 
 Isso é útil por exemplo quando queremos limitar uma macro a uma única função, pois macros não tem escopo.
 
+Também é útil para resolver conflitos quando macros definidas por bibliotecas externas conflitarem com seu próprio código.
+
 ## Macros pre-definidas
 Algumas macros são predefinidas pelo padrão do C e estão sempre presentes : 
 
@@ -230,3 +232,202 @@ Outras macros, podem opcionalmente serem predefinidas pela implementação:
 A diretiva `#line` pode ser utilizada para modificar os valores de `__FILE__` e `__LINE__`, a sintaxe é :
 - `#line num_linha` : Modifica o número da linha utilizado em `__LINE__`.
 - `#line num_linha "nome arquivo"`: Modifica o nome do arquivo utilizado em `__FILE__` e o número da linha em `__LINE__`.
+
+## Exemplos interessantes no uso de Macros
+Como mencionado anteriormente, podemos utilizar macros para introduzir funcionalidades alto nível na linguagem, o que pode ser tanto positivo quanto negativo, pois isso nos permite distanciar nosso código do que seria visto como normal em C.
+
+Vamos listar algumas funcionalidades genéricas que podemos fazer com macros:
+
+### Tamanho do array
+```c
+#define ARRAY_SIZE(X) (sizeof(X)/sizeof(*X))
+```
+
+Só funciona em arrays, os quais `sizeof` retorna o tamanho total (e não em ponteiros).
+
+### Limitação de valores
+```c
+
+//Valor máximo entre 2 valores
+#define MATH_MAX(A,B) ((A) > (B) ? (A) : (B))
+
+//Valor mínimo entre 2 valores
+#define MATH_MIN(A,B) ((A) < (B) ? (A) : (B))
+
+//Limita um valor entre um mínimo e máximo
+#define MATH_CLAMP(VAL,MIN,MAX) ((VAL) > (MAX) ? (MAX) : \
+                                 (VAL) < (MIN) ? (MIN) \
+                                               : (VAL))
+```
+
+Lembrando que não é recomendado o uso de funções nos parâmetros dessas macros, pois isso implicaria em 2 chamadas de uma das funções.
+
+### Ponteiro de estrutura a partir de ponteiro de membro
+Na biblioteca `stddef.h`, incluida junto com a `stdlib.h`, temos a macro `offsetof` que pode ser utilizada para obter o offset em bytes de um membro de uma `struct`.
+
+Com base na `offsetof` é possível implementar uma função que obtem o endereço da `struct` a partir do enderço de um membro.
+
+```c
+//ptr    é um ponteiro para o membro
+//type   é o tipo da estrutura
+//member é o nome do membro
+#define container_of(ptr, type, member) ({                      \
+        const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+        (type *)((char *)__mptr - offsetof(type,member));})
+
+struct Teste{
+    int v1;
+    int v2;
+};
+
+struct Teste test;
+int *ptr = &test.v1;
+struct Teste *testptr = container_of(ptr, struct Teste, v1);
+```
+A macro funciona com base em 3 parâmetros : 
+- `ptr` : Ponteiro para membro
+- `type`: Tipo da estrutura
+- `member`: Nome do membro
+
+### Loops foreach
+
+{{#tabs }}
+
+{{#tab name="Antes do C23"}}
+```c
+#define for_each_zero(TYPE, ITEM, ARRAY) \
+    for(TYPE *ITEM = ARRAY; *ITEM; ITEM++)
+
+#define for_each_ptr(TYPE, ITEM, ARRAY, SIZE) \
+    for(TYPE *ITEM = ARRAY; ITEM < (ARRAY + SIZE); ITEM++)
+
+#define for_each_ll(TYPE, ITEM, LINKEDLIST) \
+    for(TYPE *ITEM = LINKEDLIST; *ITEM; ITEM = ITEM->proximo)
+
+#define for_each(TYPE, ITEM, ARRAY) for_each_ptr(TYPE, ITEM, ARRAY, ARRAY_SIZE(ARRAY))
+
+//Itera sob arrays onde o último elemento com zero sinaliza o fim
+for_each_zero(const char, c, "Abacaxi") {
+    putc(*c);
+}
+
+//Itera sob arrays fixos
+const char *carrinho[] = {"Fonte 500W", "Gabinete Gamer",
+                          "RAM 16GB 2666MHz", "RX 580"};
+for_each(const char*, item, carrinho) {
+    puts(*item);
+}
+
+//Itera sob arrays dinâmicos
+int *numeros = malloc(sizeof(int) * 10);
+for_each_ptr(int, numero, numeros) {
+    int quadrado = (*numero) * (*numero);
+    printf("%d\n" , quadrado);
+}
+
+
+//Preparação para uso
+struct ListaEncadeada{
+    int valor;
+    struct ListaEncadeada *proximo;
+} lista[10];
+for(int i = 0; i < 10; i++) {
+    lista[i].valor = i;
+    lista[i].proximo = lista + i + 1;
+}
+lista[9].proximo = NULL;
+
+//Itera sob cada elemento de uma lista encadeada
+for_each_ll(struct ListaEncadeada, item, lista) {
+    printf("%d\n", item->valor);
+}
+```
+{{#endtab }}
+{{#tab name="Depois do C23"}}
+```c
+#define for_each_zero(ITEM, ARRAY) \
+    for(typeof(ARRAY) ITEM = ARRAY; *ITEM; ITEM++)
+
+#define for_each_ptr(ITEM, ARRAY, SIZE) \
+    for(typeof(ARRAY) ITEM = ARRAY; ITEM < (ARRAY + SIZE); ITEM++)
+
+#define for_each_ll(ITEM, LINKEDLIST) \
+    for(typeof(LINKEDLIST) ITEM = LINKEDLIST; *ITEM; ITEM = ITEM->proximo)
+
+#define for_each(ITEM, ARRAY) for_each_ptr(ITEM, ARRAY, ARRAY_SIZE(ARRAY))
+
+//Itera sob arrays onde o último elemento com zero sinaliza o fim
+for_each_zero(c, "Abacaxi") {
+    putc(*c);
+}
+
+//Itera sob arrays fixos
+const char *carrinho[] = {"Fonte 500W", "Gabinete Gamer",
+                          "RAM 16GB 2666MHz", "RX 580"};
+for_each(item, carrinho) {
+    puts(*item);
+}
+
+//Itera sob arrays dinâmicos
+int *numeros = malloc(sizeof(int) * 10);
+for_each_ptr(numero, numeros) {
+    int quadrado = (*numero) * (*numero);
+    printf("%d\n" , quadrado);
+}
+
+//Preparação para uso
+struct ListaEncadeada{
+    int valor;
+    struct ListaEncadeada *proximo;
+} lista[10];
+for(int i = 0; i < 10; i++) {
+    lista[i].valor = i;
+    lista[i].proximo = lista + i + 1;
+}
+lista[9].proximo = NULL;
+
+//Itera sob cada elemento de uma lista encadeada
+for_each_ll(item, lista) {
+    printf("%d\n", item->valor);
+}
+```
+{{#endtab }}
+{{#endtabs }}
+
+Nesse caso, a macro `for_each` e suas variantes fazem com que o item seja um ponteiro para cada elemento do array, possivelmente permitindo a modificação de cada elemento.
+
+O `C23` facilita a implementação dessas funcionalidades alto nível ao fornecer a palavra chave `typeof`, eliminando a necessidade de repassar o tipo, que pode ser deduzido do array ou lista encadeada.
+
+Também incluimos uma variante com listas encadeadas, demonstrando como diferentes tipos de dados que devem ser iterados de formas diferentes, podem ser simplificados para uma iteração similar através de macros.
+
+### Parâmetros nomeados
+Devido a introdução dos [literais compostos](./10-literais.md#literais-compostos), é posível criar `structs` que podem ter seu endereço utilizado sem a necessidade de criar variáveis.
+
+Além disso, ao utilizar inicializadores designados, um mesmo campo pode ser inicializado duas vezes e apenas a última inicialização é levada em consideração.
+
+Ao definir uma `struct` com todos parâmetros opcionais/nomeados, usá-la como parâmetro no final de uma função e utilizarmos uma macro variádica para chamá-la, podemos efetivamente ter parâmetros opcionais e nomeados, conforme demonstra o exemplo:
+
+```c
+//Uso da macro
+imprimePdf(pdf);                                     //Padrão
+imprimePdf(pdf, .paginas = 2, .papel = PAPEL_A5);    //Imprime 2 páginas em A5
+imprimePdf(pdf, .impressora = hp_scx_4200);          //Usa outra impressora
+imprimePdf(pdf, .retrato = false, .colorida = true); //Define modo paisagem colorido
+
+//Implementação
+struct ImprimePdfParam {
+    void *impressora; //Padrão NULL     -> Impressora padrão
+    int paginas;      //Padrão -1       -> Todas
+    int papel;        //Padrão PAPEL_A4 -> A4
+    double escala;    //Padrão 1.0      -> Escala 1:1
+    bool retrato;     //Padrão true     -> Modo retrato
+    bool colorida;    //Padrão false    -> página em preto e branco
+};
+
+#define imprimePdf(PDF, ...) \
+    _imprimePdf(PDF, (struct ImprimePdfParam){.paginas = -1, \ 
+                     .papel = PAPEL_A4, .escala = 1.0, .retrato = true, __VA_ARGS__})
+
+_imprimePdf(void *pdf, struct ImprimePdfParam opcoes) { /*Implementação*/}
+```
+

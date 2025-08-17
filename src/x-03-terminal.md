@@ -9,7 +9,7 @@ Um dos terminais mais conhecidos é o `VT-100`, demonstrado na imagem a seguir:
 
 ![](./img/vt100.png)
 
-O `VT-100` apresenta uma interface serial, que pode ser conectada a um computador para realizar a comunicação entre eles, sistemas operacionais como o linux apresentam drivers para uso do `VT-100` que é suportado e pode ser utilizados mesmo nos dias de hoje.
+O `VT-100` apresenta uma interface serial, que pode ser conectada a um computador para realizar a comunicação entre eles, sistemas operacionais como o linux apresentam drivers para uso do `VT-100` que é suportado e pode ser utilizado mesmo nos dias de hoje.
 
 No linux, é comum que terminais conectados em hardware sejam expostos como "arquivos" no caminho `/dev/ttyX`, onde `X` indica o número do terminal (o nome `tty` vem de "teletypewriter" literalmente "teletipo" em inglês).
 
@@ -81,6 +81,10 @@ Os interpretadores de script `shell` e funções do sistema de arquivos normalme
 
 O comando `cd` pode ser utilizado para modificar a pasta atual, utilizar caminhos relativos permite realizar uma "navegação em pastas" utilizando o terminal.
 
+```bash
+
+``` 
+
 #### Variáveis
 
 As variáveis de ambiente do sistema normalmente podem ser acessadas como variáveis diretamente no `shell`, no `batch` uma variável pode ser acessada utilizando `%variavel%`, enquanto no `powershell`, `bash` e outros utilizando `$variavel`.
@@ -93,7 +97,9 @@ Para criar novas variáveis, podemos utilizar `$variavel = valor` no `powershell
 Normalmente existem 3 formas de escrever um caminho para executar um programa : 
 - `programa`: Procura nas pastas da variável `PATH` e na pasta atual
 - `./programa`: Procura na pasta atual utilizando um caminho relativo
-- `/usr/bin/programa`: Caminho completo
+- `/usr/bin/programa`: Caminho complet
+
+(Lembrando que a `/` deve ser substituida por `\` no Windows)
 
 Para executar um programa, é normalmente utilizada a sintaxe:
 ```bash
@@ -103,7 +109,8 @@ Onde `programa` é o caminho do programa e os argumentos da linha de comando uti
 
 Para incluir espaços dentro do argumento, é necessário colocar o argumento entre aspas.
 
-No `powershell`, `bash` e outros `shells` modernos podemos utilizar `$variavel = ./programa` para que a `variavel` receba a saída do programa (o que foi escrito na `stdout`).
+No `powershell`, podemos utilizar `$variavel = ./programa` para que a `variavel` receba a saída do programa (o que foi escrito na `stdout`). Enquanto que no `bash` e outros 
+`shells` precisamos utilizar `$variavel = $(./programa)` para a mesma funcionalidade.
 
 #### Redirecionar saídas e entradas
 
@@ -155,6 +162,97 @@ Os seguintes comandos não existem no `batch`, mas estão presentes como apelido
 - `man`: Exibe um manual do comando especificado no próprio terminal
 - `tee`: Lê da `stdin` e escreve na `stdout` e numa lista de arquivos, o que foi lido
 - `kill`: Finaliza o processo com o ID especificado
+
+## Leitura do terminal no C
+Por mais trivial e simples que pareça ser uma simples leitura do terminal, existem diversas funções diferentes que podem ser utilizadas para leitura do terminal, todas com suas próprias vantagens/desvantagens.
+
+- [`scanf`](https://en.cppreference.com/w/c/io/fscanf): Extremamente simples de utilizar e já realiza conversões de forma fácil, boa para casos onde a entrada sempre respeita um formato fixo e tamanho esperado, mas péssima para leitura de entrada do usuário, pela dificuldade ou impossibilidade de tratar erros e facilidade de causar problemas de segurança.
+- [`fgets`](https://en.cppreference.com/w/c/io/fgets): Melhor função para leitura de linhas que é padrão do C, inclui o caractere de nova linha no texto obtido, limitando para que seja escrito no máximo `tamanho-1` de forma que o último caractere escrito seja o `\0`, seu único defeito é que essa função não reporta o tamanho da string e nem quando um caractere de nova linha não foi encontrado, sendo necessário chamar `strlen` e checar manualmente.
+- [`GNU readline`](https://www.man7.org/linux/man-pages/man3/readline.3.html): Na biblioteca padrão do Linux do grupo GNU, a `glibc`, existe uma função chamada `readline` que retorna a string lida alocada dinamicamente, que depois deve ser liberada com `free`, a função também oferece capacidade de utilizar edição de linha e histórico de comandos.
+- [`GNU getline`](https://man7.org/linux/man-pages/man3/getline.3.html): Também uma extensão do GNU na `glibc`, recebe um buffer pre-alocado do usuário com `malloc` e o expande internamente utilizando `realloc` caso necessário, não apresenta as funcionalidades extras de histórico e edição da `readline`.
+- [`ReadConsoleW`](https://learn.microsoft.com/en-us/windows/console/readconsole): Função específica do Windows para leitura de terminal, lê strings em UTF-16 independente das configurações de locale do usuário, é a forma recomendada de ler do terminal no Windows, essa função também reporta o número de bytes lidos e inclui `\r\n` (o terminador de nova linha do Windows) no buffer.
+
+Nos casos onde deseja-se ler valores que não são strings, como inteiros e ponto flutuantes, saiba que o terminal sempre entrega os valores em texto, o ideal é utilizar funções como `strtol`, `strtof`, `strtod` ou até mesmo `sscanf`, inclusive a maioria das linguagens de alto nível seguem o padrão de leitura + conversão que difere do padrão encontrado em `scanf`.
+
+Ao realizar esse guia, investigamos o código fonte do [`CPython`](https://github.com/python/cpython) e [`.NET Core`](https://github.com/dotnet/runtime) usado e desenvolvido em C# para fins comparativos.
+
+O `CPython` utiliza a função `ReadConsoleW` no Windows, `readline` do GNU no Linux e `fgets` em outros lugares.
+
+O `.NET Core` utiliza a função `ReadConsoleW` no Windows e lê diretamente utilizando funções nativas como `open` e `read` nos sistemas UNIX (como Linux, macOs e afins). A diferença é que a leitura é bufferizada e depois extraida caractere por caractere para preencher a string retornada ao usuário por funções alto nível como `Console.ReadLine`.
+
+Para isso também foi realizada uma implementação própria para leitura de linhas de um arquivo qualquer (normalmente `stdin`) utilizando como base a função `fgetc` e outra com `fgets`:
+<details>
+  <summary>Clique para Expandir/Retrair</summary>
+
+```c
+enum readline_result{
+    READLINE_OK,            //A linha foi lida com sucesso
+    READLINE_PENDING_CHARS, //Não há espaço para a string inteira
+    READLINE_EOF,           //Final do arquivo foi atingido
+    READLINE_FILE_ERR,      //Erro no arquivo
+    READLINE_INVALID_PARAM, //Parâmetro inválido
+};
+
+/**
+ * @brief Lê uma linha do arquivo especificado sem incluir o caractere de nova linha
+ * @param buffer Buffer onde os dados serão escritos
+ * @param size Ponteiro para tamanho do buffer na entrada, bytes lidos na saída
+ * @param file Arquivo do qual será lido (geralmente stdin)
+ * @return Resultado da função, indicando erro ou leitura completa
+ */
+enum readline_result my_readline(char *buffer, size_t *size, FILE *file)
+{
+    enum readline_result result = READLINE_PENDING_CHARS; 
+                                                          
+    if(buffer == NULL || size == NULL || *size == 0)
+        return READLINE_INVALID_PARAM;
+
+    char *basebuf = buffer;
+    char *endbuf  = buffer + *size;
+    for(;buffer < endbuf; buffer++) {
+        int c = fgetc(file);
+        if(c == EOF || c == '\n') {
+            result = (c == '\n')  ? READLINE_OK :
+                     (feof(file)) ? READLINE_EOF 
+                                  : READLINE_FILE_ERR;
+            break;
+        }
+        *buffer = (char)c;
+    }
+    *buffer  = '\0';
+    *size    = (buffer - basebuf); 
+    return result;
+}
+
+//Versão de `fgets` seguindo o padrão
+enum readline_result fgets_readline(char *buffer, size_t *size, FILE *file)
+{
+    if(buffer == NULL || size == NULL)
+        return READLINE_INVALID_PARAM;
+
+    char *result = fgets(buffer, *size, file);
+    unsigned char had_newline = 0;
+    if(result != NULL) {
+        *size = strlen(buffer);
+        //Remove o "\n"
+        had_newline = (buffer[*size-1] == '\n');
+        buffer[*size-1] = '\0';
+        *size--;
+    } else {
+        *size = 0;
+    }
+    
+    if(feof(file))
+        return READLINE_EOF;
+
+    if(result == NULL) 
+        return ferror(file) ? READLINE_FILE_ERR : READLINE_INVALID_PARAM;   
+    else 
+        return had_newline ? READLINE_OK : READLINE_PENDING_CHARS;
+}
+```
+Essas funções repassam todos possíveis casos de erro como retorno da função além do tamanho, lidando propriamente com todos os casos problemáticos, a ideia de utilizar `fgetc` foi parcialmente inspirada pelo código fonte do `.NET Core`.
+</details>
 
 ## Sequências de Escape VT-100
 O terminal `VT-100` e seus sucessores apresentavam funções extras usando as chamadas sequências de escape.

@@ -42,7 +42,7 @@ Uma única linha de código de C pode se tornar várias instruções da máquina
 - Realizar cálculos aritméticos
 - Chamar uma interrupção de software (chamada de sistema, breakpoint, etc)
 
-A quantidade de bytes e quais valores são necessários para indicar cada comando, depende da arquitetura do processador.
+Cada arquitetura de processador tem um conjunto de instruções diferentes, de forma que os comandos disponíveis, quantos bytes e quais valores são necessários para codificar instruções em comum sejam diferentes para cada arquitetura.
 
 A linguagem assembly lida com essas diferenças pois tem comandos que correspondem diretamente as instruções do processador, sendo necessário um código diferente para cada arquitetura.
 
@@ -107,9 +107,9 @@ As inicializações de variáveis globais geralmente são realizadas por uma das
 - Pela biblioteca padrão do C antes da inicialização da função `main` 
 - Por um código de inicialização próprio em sistemas bare metal
 
-1. Uma região com variáveis não inicializadas é preparada ao reservar memória para a região e preenché-la com zeros, a vantagem é que essas variáveis não ocupam espaço no arquivo do executável ou memória flash/magnética do dispositivo.
+1. Uma região com variáveis não inicializadas é preparada ao reservar memória para a região e preenché-la com zeros, a vantagem é que essas variáveis não ocupam espaço no arquivo do executável ou memória flash/magnética do dispositivo pois não precisamos guardar seu valor inicial (apenas um inteiro indicando o tamanho total da região).
 
-2. Uma região com variáveis inicializadas é preparada reservando memória para a região e copiando o conteúdo no arquivo executável ou memória flash/magnética para essa região.
+2. Uma região com variáveis inicializadas é preparada reservando memória para a região e copiando o conteúdo do arquivo executável ou memória flash/magnética para essa região.
 
 ## Stack
 Cada thread tem uma região de memória reservada como "Stack", que no português seria uma "Pilha", utilizada para variáveis locais, de [`duração automática`](./4-00-variaveis.md#modificadores-de-armazenamento).
