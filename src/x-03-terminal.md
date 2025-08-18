@@ -82,7 +82,15 @@ Os interpretadores de script `shell` e funções do sistema de arquivos normalme
 O comando `cd` pode ser utilizado para modificar a pasta atual, utilizar caminhos relativos permite realizar uma "navegação em pastas" utilizando o terminal.
 
 ```bash
+#Funciona em qualquer sistema
+cd ..      #Volta uma pasta
+cd imagens #Entra na pasta imagens
 
+#Sistemas UNIX
+cd /usr/bin #Entra na pasta /usr/bin 
+
+#Windows
+cd C:\    #Entra no disco C:\ do windows
 ``` 
 
 #### Variáveis

@@ -11,7 +11,7 @@
 - [Controle de Fluxo](./5-controle-de-fluxo.md)
 - [Laços de Repetição](./6-lacos-de-repeticao.md)
 - [Funções](./7-funcoes.md)
-- [Variáveis Compostas](./8-00-variaveis-compostas.md)
+- [Variáveis Derivadas](./8-00-variaveis-derivadas.md)
   - [Enumerações](./8-01-enumeracoes.md)
   - [Arrays](./8-02-arrays.md)
   - [Estruturas](./8-03-estruturas.md)
