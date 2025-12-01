@@ -163,7 +163,83 @@ int main()
     //"%u" é o modificador para escrever um unsigned int no printf
     printf("%u %u\n", test1 + 1U, test2 - 1U);
 }
-``` 
+```
+
+### Aritmética Verificada
+Desde o `C23`, a biblioteca `stdckdint.h`, foi adicionada, permitindo uma forma portável de realizar soma, subtração ou multiplicações checando se a operação teve sucesso sem overflow ou underflow através das macros `ckd_add`, `ckd_sub`, `ckd_mul`.
+
+Todas as macros tem a seguinte sintaxe para chamada : 
+```c
+bool ckd_xxx(tipo1 *resultado, tipo2 a, tipo3 b);
+```
+
+Onde `tipo1`, `tipo2` e `tipo3` podem ser tipos diferentes, a verificação realizada é se a operação resultante com `a` e `b` pode ser guardada em `resultado` sem overflow/underflow ou truncamento, sendo `tipo1` um ponteiro para o tipo guardando o resultado.
+
+Todas as 3 operações funcionam com qualquer tipo inteiro que não seja `char`, `bool`, `_BitInt(N)`, ou `enum`.
+
+Lembrando que antes da existência dessa biblioteca, essas operações eram fornecidas como extensões de compiladores e, inclusive, são geralmente implementadas apontando as macros para as respectivas extensões já existentes.
+
+Além disso a aritmética verificada geralmente é extremamente eficiente em alguns processadores, devido a presença de registradores de flags do processador que guardam se a última operação aritmética resultou em overflow/underflow, de forma que utilizar essas extensões seja absurdamente mais eficiente do que realizar a checagem por conta.
+
+Para código escrito antes do `C23`, é possível implementar uma biblioteca que fornece a funcionalidade nos principais compiladores de C : 
+```c
+#if defined(__GNUC__) || defined(__clang__)
+    #define ckd_add(R, A, B) __builtin_add_overflow((A), (B), (R))
+    #define ckd_sub(R, A, B) __builtin_sub_overflow((A), (B), (R))
+    #define ckd_mul(R, A, B) __builtin_mul_overflow((A), (B), (R))
+#elif defined(_MSC_VER) 
+    //A Microsoft não fornece uma extensão de compilador "equivalente"
+    //mas tem uma biblioteca que realiza essas operações
+    //Utiliza a palavra chave _Generic adicionada no C11 para implementar a aritmética checada
+    #include <intsafe.h>
+    #define ckd_add(R, A, B) _Generic(*R, \
+        signed char:Int8Add, \
+        unsigned char:Uint8Add, \
+        short:ShortAdd, \
+        unsigned short:UShortAdd, \
+        int:IntAdd, \
+        unsigned int:UIntAdd, \
+        long:LongAdd, \
+        unsigned long: ULongAdd, \
+        long long:LongLongAdd, \
+        unsigned long long:ULongLongAdd, \
+        intptr_t:IntPtrAdd, \
+        size_t:SizeTAdd, \
+        ssize_t:SSizeTAdd, \
+    )(A,B,R) 
+    #define ckd_sub(R, A, B) _Generic(*R, \
+        signed char:Int8Sub, \
+        unsigned char:Uint8Sub, \
+        short:ShortSub, \
+        unsigned short:UShortSub, \
+        int:IntSub, \
+        unsigned int:UIntSub, \
+        long:LongSub, \
+        unsigned long: ULongSub, \
+        long long:LongLongSub, \
+        unsigned long long:ULongLongSub, \
+        intptr_t:IntPtrSub, \
+        size_t:SizeTSub, \
+        ssize_t:SSizeTSub, \
+    )(A,B,R)
+    #define ckd_mul(R, A, B) _Generic(*R, \
+        signed char:Int8Mult, \
+        unsigned char:Uint8Mult, \
+        short:ShortMult, \
+        unsigned short:UShortMult, \
+        int:IntMult, \
+        unsigned int:UIntMult, \
+        long:LongMult, \
+        unsigned long: ULongMult, \
+        long long:LongLongMult, \
+        unsigned long long:ULongLongMult, \
+        intptr_t:IntPtrMult, \
+        size_t:SizeTMult, \
+        ssize_t:SSizeTMult, \
+    )(A,B,R)
+#endif
+```
+
 
 ## Dicas para uso consciente de inteiros
 No geral, aconselho utilizar `signed char` e `unsigned char` para representar bytes, `int`/`unsigned int` para inteiros genéricos onde o tamanho não é problema (todas as plataformas modernas tem geralmente um `int` de pelo menos 32bits, a menos que sejam processadores embarcados de 16/8 bits ou arquiteturas super específicas).

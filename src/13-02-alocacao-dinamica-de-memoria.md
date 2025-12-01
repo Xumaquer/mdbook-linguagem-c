@@ -247,7 +247,7 @@ Possíveis causas :
 - Uso incorreto de bibliotecas externas, apesar de um pouco mais incomum
 
 Podemos resolver ou detectar problemas de liberação dupla :
-- Simplesmente utilizando um debugger, pois esses problemas geralmente finalizam o programa de forma inesperada e podem ser diagnosticado, analisando o valores das variáveis e a pilha de chamadas durante o acontecido
+- Simplesmente utilizando um debugger, pois esses problemas geralmente finalizam o programa de forma inesperada e podem ser diagnosticados, analisando o valores das variáveis e a pilha de chamadas.
 - Utilizando uma implementação similar ao [`Leaky`](https://github.com/itsYakub/Leaky/?tab=readme-ov-file) mencionado anteriormente, porém checando se os blocos alocados já foram liberados e reportando esse erro, o que permitiria um diagnóstico
 - Utilizando [`valgrind`](https://valgrind.org/)
 - Anulando as variáveis que carregam o ponteiro após liberar a memória pela primeira vez (que de preferência, seja apenas uma)
@@ -283,8 +283,8 @@ Outro ponto que ajuda a compreeender melhor, é entender como outras implementa�
 
 Quanto as implicações da estratégias utilizadas pelas linguagens:
 - Utilizar garbage collector é mais custoso em relação a performance, porém elimina totalmente as preocupações quanto ao gerenciamento de memória.
-- Utilizar contagem de referência para todas variáveis alocadas dinâmicamente é geralmente mais eficiente do que utilizar um garbage collector,
-- O método do Rust e do C++ são as formas ideais, onde temos abstrações de "custo zero" para desalocar memória, o único problema é que elas introduzem complexidade adicional na escrita do código.
+- Utilizar contagem de referência para todas variáveis alocadas dinâmicamente é geralmente mais eficiente do que utilizar um garbage collector.
+- Os métodos do Rust e do C++ são os mais eficientes, onde temos abstrações de "custo zero" para desalocar memória, o único problema é que elas introduzem complexidade adicional na escrita do código.
 
 ## Uso de memória dinâmica em sistemas embarcados
 Em sistemas embarcados, é normalmente desaconselhado o uso de memória dinâmica por vários motivos : 

@@ -36,8 +36,9 @@ Sendo elas:
 - `\"` : Usado para digitar o caractere `"` pois ele é normalmente usado para literais de string
 - `\\` : Usado para digitar o caractere `\` pois ele é usado para sequências de escape
 - `\OOO`: Usado para digitar um caractere em uma string, indicando uma sequência no sistema númerico octal, `OOO` deve ser números de `0` a `8`
-- `\xHH`: Usado para digitar um caractere ASCII, diretamente no seu valor em hexadecimal, `HH` deve ser 2 digitos hexadecimais.
-- `\xHHHH`: Usado para digitar um caractere Unicode, diretamente no seu valor em hexadecimal, `HHHH` deve ser 4 digitos hexadecimais.
+- `\xHH`: Usado para digitar caracteres ASCII, diretamente no seu valor em hexadecimal, `HH` pode ser uma sequência de qualquer tamanho de digitos hexadecimais.
+- `\unnnn`: Usado para digitar um caractere Unicode com valor `U+nnnn` (desde o `C99`).
+- `\Unnnnnnnn`: Usado para digitar um caractere Unicode com valor `U+nnnnnnnn` (desde o `C99`).
 
 ## Tipos adicionais de caracteres
 Existem outros tipos adicionais de caracteres, sendo eles : 

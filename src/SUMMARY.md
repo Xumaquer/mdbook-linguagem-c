@@ -29,6 +29,7 @@
 - [Sistema Operacional](./13-00-sistema-operacional.md)
   - [Layout de Memória](./13-01-layout-de-memoria.md)
   - [Alocação Dinâmica de Memória](./13-02-alocacao-dinamica-de-memoria.md)
+  - [Arquivos](./13-03-arquivos.md)
 - [Apêndice](./x-00-apendice.md)
   - [Números Binários](./x-01-numeros-binarios.md)
   - [Números Hexadecimais](./x-02-numeros-hexadecimais.md)

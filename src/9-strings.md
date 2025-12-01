@@ -244,6 +244,54 @@ for(int i = 0; str[i]; i++) {
 }
 ```
 
+## Localidade
+Na biblioteca `locale.h` temos a função `setlocale` que permite a mudança da localidade do ambiente de execução da linguagem C, essa mudança pode ser completa ou parcial.
+
+A função `setlocale` tem a seguinte sintaxe
+```c
+char *setlocale(int categoria, const char *locale);
+```
+
+Onde a `categoria` indica flags que são utilizadas para selecionar a categoria que será modificada :
+- `LC_ALL`: Todas as categorias são modificadas (inclusive categorias que não são padrão)
+- `LC_COLLATE`: Afeta comparação e transformações de strings adaptadas aos requisitos do idioma específico (afeta `strcoll` e `strxfrm`) 
+- `LC_CTYPE`: Afeta o resultado das funções da biblioteca `ctype.h` que classificam caracteres (`isalpha`, `isdigit`, etc)
+- `LC_MONETARY`: Afeta a formatação de unidades monetárias (afeta apenas `localeconv`)
+- `LC_NUMERIC`: Afeta a formatação númerica (afeta `printf`, `scanf`, `strtod`, `strtof`, etc)
+- `LC_TIME`: Afeta a formatação de tempo (afeta `strftime`)
+- `LC_MESSAGES`: Presente apenas em sistemas POSIX, afeta o idioma das mensagens de erro fornecidas por `strerror` e `perror`
+
+`locale` é uma string que identifica as configurações de localidade com formato não definido pelo padrão do C, mas que segue o seguinte formato tanto no linux quanto no Windows:
+``` 
+idioma[_território][.encoding]
+```
+
+Onde (considere os campos com `[]` como opcionais) : 
+- `idioma` é um dos códigos da [ISO 639](https://www.loc.gov/standards/iso639-2/php/code_list.php) no Linux e [segue uma lista específica](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c) no Windows.
+- `território` é um dos códigos de países da [ISO 3166](https://static.developer.mastercard.com/content/cross-border-services/uploads/ISO%203166%20Country%20Codes.pdf) no Linux ou [segue uma lista específica](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c) no Windows.
+- `encoding` é um texto específico de plataforma identificando o encoding utilizado, no geral o aconselhável é utilizar sempre `utf8` que é o modo mais portável, no Windows `encoding` pode ser o número do código de página ou `ACP` para o código de página atual do usuário e no Linux o nome do encoding .
+
+Podemos checar a lista de opções de locale no Linux executando o comando `locale -a` no terminal.
+
+Lembrando que o encoding `utf8` só é suportado desde o Windows 10 e para que ele funcione devemos utilizar o ambiente de execução UCRT (Universal C Runtime) que é um ambiente de execução mais moderno para C no Windows ao invés do clássico mingw que usa a biblioteca de vínculo dinâmico `msvcrt.dll`.
+
+Ainda assim, mesmo quando utilizamos o locale de `utf8`, no Windows a conversão que ocorre é `encoding do C` -> `encoding do terminal` -> `UTF-16`, de forma que mesmo definindo corretamente o locale como `utf8`, ainda estamos limitados aos caracteres suportados pelo encoding atual do terminal, que pode ser modificado utilizando a função [`SetConsoleOutputCP`](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp) (muda o encoding da saída do terminal) e [`SetConsoleCP`](https://learn.microsoft.com/en-us/windows/console/setconsolecp) (muda o encoding da entrada do terminal).
+
+Por padrão, o locale inicialmente configurado é equivalente a `setlocale(LC_ALL, "C")`, ao utilizar `"C"` estamos indicando o locale padrão que tem um comportamento consistente em todos os ambientes, podemos também utilizar uma string vazia `""` para indicar que queremos utilizar o locale do sistema, que geralmente é controlado pelas configurações do sistema operacional e variáveis de ambiente. Para obter a configuração de locale atual, basta utilizar `NULL` na configuração do locale.
+
+Além disso, há uma função chamada `localeconv` que retorna um ponteiro do tipo `struct lconv`, que contém diversas variáveis com detalhes sobre formatação de unidades monetárias e números associados a configuração da localidade atual.
+
+## Strings de múltiplos bytes
+O formato de string considerado como atual pelo ambiente de execução da linguagem C depende da configuração definida com `setlocale`, alguns encodings podem utilizar mais de um byte por caractere, neste caso, há funções da biblioteca padrão que reconhecem esse detalhe e lidam especificamente com ele.
+
+As strings que se encaixam nessa categoria são mencionadas como strings de múltiplos bytes, ou no inglês "multi-byte strings" (identificadas pelo prefixo `mb` nas funções da biblioteca padrão), é possível obter o maior número de bytes que um caractere pode precisar no formato de string atual através da macro `MB_CUR_MAX`.
+
+Podemos utilizar as funções iniciando em `mbrto` para converter um caractere multi byte para diversos formatos como UTF-8 (`C23`), UTF-16 (`C11`), UTF-32 (`C11`) ou `wchar_t`. 
+
+A iteração sobre strings de múltiplos bytes normalmente envolve o tipo `mbrstate_t` que é capaz de guardar o estado atual da conversão, isso acaba sendo necessário pois alguns formatos usam códigos especiais para trocar o significado dos outros caracteres (como o encoding japonês Shift-JIS).
+
+É recomendável que o usuário evite funções que não utilizam `mbrstate_t` mas tem uma contraparte que aceita, como por exemplo a função `mblen` que idealmente deve ser substituida por `mbrlen`, pois essas funções geralmente dependem de um estado global, o que acaba por causar conflitos ao utilizar em conjunto com múltiplos threads ou problemas ao utilizar as funções de forma incorreta.
+
 ## Diferentes representações de String
 Neste campo vamos falar sobre algo um pouco avançado, as diferentes implementações para representar strings em várias linguagens, incluindo C e até mesmo bibliotecas renomadas que buscam algo mais eficiente, destacando os pontos positivos e negativos de cada formato.
 

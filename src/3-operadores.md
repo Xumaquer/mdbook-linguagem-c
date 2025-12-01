@@ -119,8 +119,8 @@ O curioso desses operadores é que, a posição onde são colocados altera o com
     //Neste ponto, i é zero
     int x = ++i;  //"x" é 1 e "i" é 1 (pois i foi incrementado e depois lido)
     int y = i++;  //"y" é 1 e "i" é 2 (pois i foi lido e depois incrementado)
-    int z = --i;  //"z" é 0 e "i" é 1 (pois i foi decrementado e depois lido)
-    int w = i--;  //"w" é 0 e "i" é 0 (pois i foi lido e depois decrementado)
+    int z = --i;  //"z" é 1 e "i" é 1 (pois i foi decrementado e depois lido)
+    int w = i--;  //"w" é 1 e "i" é 0 (pois i foi lido e depois decrementado)
 ```
 
 Poderiamos dizer que :
@@ -196,7 +196,7 @@ Logo caso o primeiro valor já seja o suficiente para estabelecer o resultado da
 ```
 
 ## Operadores Bit a Bit 
-Antes de olhar esta parte sobre operadores bit a bit, aconselho fortemente que veja a seção sobre [Números Binários](#x-01-numeros-binarios.md), ou deixe este pedaço para depois.
+Antes de olhar esta parte sobre operadores bit a bit, aconselho fortemente que veja o capítulo sobre [Números Binários](#x-01-numeros-binarios.md), ou deixe este pedaço para depois.
 
 Assume-se ao menos um conhecimento acerca de números binários e que o leitor saiba o que são BITS.
 

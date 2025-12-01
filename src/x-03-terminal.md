@@ -3,6 +3,8 @@ Um terminal de computador é um dispositivo eletrônico ou eletromecânico capaz
 
 Os primeiros "terminais" eram dispositivos com tela, capazes de transcrever caracteres digitados em um teclado e renderizar a entrada do usuário junto da resposta do computador em uma interface baseada em texto, que ainda deveriam ser conectada a um computador que fará o processamento real dos comandos.
 
+Os terminais funcionam enviando os dados de texto digitados pelo usuário e recebendo de volta dados de texto da resposta do sistema ao qual ele está interligado, que são mostrados graficamente em seu visor.
+
 As mensagens de terminais são históricamente finalizadas com o caractere especial `\n`, que indica uma sinalização de nova linha.
 
 Um dos terminais mais conhecidos é o `VT-100`, demonstrado na imagem a seguir:
@@ -105,7 +107,7 @@ Para criar novas variáveis, podemos utilizar `$variavel = valor` no `powershell
 Normalmente existem 3 formas de escrever um caminho para executar um programa : 
 - `programa`: Procura nas pastas da variável `PATH` e na pasta atual
 - `./programa`: Procura na pasta atual utilizando um caminho relativo
-- `/usr/bin/programa`: Caminho complet
+- `/usr/bin/programa`: Caminho completo
 
 (Lembrando que a `/` deve ser substituida por `\` no Windows)
 
@@ -282,6 +284,8 @@ No Windows, as sequências de terminal `VT-100` só foram adotadas recentemente,
 
 Muitos cursos de C ensinam a limpar a tela do terminal utilizando `system("cls")`, este comando só funciona no Windows e ainda é extremamente ineficiente, pois a função `system` abre um novo processo do `shell` para executar o comando e espera até que ele finalize.
 
-Utilizar as sequências de escape garante uma compatibilidade com mais sistemas operacionais, maior performance, além de permitir que os comandos sejam embarcados em arquivos e acionados ao escrevê-los no terminal.
+Utilizar as sequências de escape garante uma compatibilidade com mais sistemas operacionais, maior performance, além de permitir que os comandos sejam embarcados em arquivos e acionados ao escrevê-los no terminal. 
 
 Para utilizar a maioria das sequências de escape suportadas no Windows, Linux e macOs, podemos utilizar uma biblioteca própria feita pelo autor deste guia denominada <a href="./libs/vt100.h" download>vt100.h</a>.
+
+Para limpar a tela de forma similar a `system("cls")`, utilize a macro `VT100_CLEAR_SEQUENCE`, que realiza as 3 ações de mover o cursor, limpar a tela atual e o scroll.

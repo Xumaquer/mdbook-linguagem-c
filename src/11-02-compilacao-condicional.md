@@ -66,10 +66,8 @@ DBG_ASSERT(tam >= 20);
 
 Apenas expressões constantes podem estar num `#if` ou `#elif`, isso significa que variáveis `constexpr`, macros e valores de `enum` são permitidos, bem como `sizeof`.
 
-
 ## Definições úteis
 Aqui vamos citar algumas definições úteis que estão presentes em vários compiladores, lembrando que nenhuma dessas definições está presente no padrão do C e qualquer compilador PODE escolher não implementar algumas delas.
-
 
 Macros para detecção de sistema operacional : 
 - `_WIN32`: Macro definida quando compilado para o sistema operacional Windows (tanto 32bits quanto 64bits).

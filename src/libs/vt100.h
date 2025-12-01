@@ -44,7 +44,12 @@
 #define VT100_ERASE_CHARS(X)   VT100_ESC"["#X"X" //Apaga `X` caracteres, sobrescrevendo caracteres com espaço
 #define VT100_INSERT_LINES(X)  VT100_ESC"["#X"L" //Insere `X` linhas, deslocando a linha que o cursor está e todas as posteriores
 #define VT100_DELETE_LINES(X)  VT100_ESC"["#X"M" //Apaga `X` linhas, começando pela linha em que o cursor está
-#define VT100_CLEAR            VT100_ESC"2J"     //Limpa a tela
+#define VT100_CLEAR            VT100_ESC"[2J"    //Limpa a tela
+#define VT100_CLEAR_SCROLL     VT100_ESC"[3J"    //Limpa a scroll
+
+//Volta pro início, limpa tela e scroll
+#define VT100_CLEAR_SEQUENCE   VT100_INPUT_HOME VT100_CLEAR VT100_CLEAR_SCROLL 
+
 #define VT100_ERASE_LINE(X)    VT100_ESC"["#X"M" //Substitui todo texto na linha especificada por espaço
 
 //Cores (genérico)
@@ -147,8 +152,6 @@ static void vt100_prepare()
     DWORD mode;
 
     if(GetFileType(hStdin) == FILE_TYPE_CHAR) {
-        if(GetConsoleMode(hStdin, &mode))
-            SetConsoleMode(hStdin, mode | ENABLE_VIRTUAL_TERMINAL_INPUT);
         SetConsoleCP(CP_UTF8);
     }
     if(GetFileType(hStdout) == FILE_TYPE_CHAR) {
