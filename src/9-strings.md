@@ -88,23 +88,190 @@ PASTA_RECURSOS "/imagem1.png"    //Este texto
 Para digitar aspas e outros caracteres especiais numa string literal, utilizamos a mesma sintaxe das [`sequências de escape`](./4-01-caracteres.md#sequências-de-escape) descritas no capítulo sobre caracteres.
 
 ### Encoding
-Antes de falar sobre os tipos de strings literais, precisamos falar sobre encoding.
+Antes de falar sobre os tipos de strings literais, precisamos falar sobre encodings.
 
-Encoding, no contexto de strings (que seria "codificação" em português), é o padrão no qual decidimos quais códigos númericos utilizamos para indicar cada caractere, no geral todo encoding moderno segue o padrão ASCII, de forma que os códigos númericos 0 a 127 representem os mesmos caracteres.
+Encoding, no contexto de strings (que seria "codificação" em português), é o padrão no qual decidimos quais códigos númericos utilizamos para indicar cada caractere, no geral todo encoding moderno extende o padrão ASCII, de forma que os códigos númericos 0 a 127 definidos no padrão ASCII ainda representem os mesmos caracteres.
 
-Porém, nos encodings modernos geralmente desejamos representar mais do que apenas 128 caracteres diferentes, foi ai que surgiram diferentes codificações que buscavam colocar 
-diferentes caracteres codificados de formas diferentes.
+Antes de contiinuar, é importante também entender o termo `code unit`  que simboliza um dos números utilizados para representar um caractere, em alguns casos, mais de um número é utilizado para representar um único caractere, houvendo uma distinção entre `code unit` vs caracteres (em aalguns encodings, um caractere pode ser formado por mais de um `code unit`).
 
-É importante também entender o termo `code unit`  que simboliza um dos números utilizados para representar um caractere, em alguns casos, mais de um número é utilizado para representar um único caractere, portanto é importante entender a distinção entre `code unit` vs caracteres.
+#### Um resumo da história dos Encodings
 
-Houve uma época onde existiam vários encodings diferentes que codificavam vários caracteres diferentes como `Latin-1` e `Shift-JIS`, entre outros. O problema dessas codificações é que elas não conversam entre sí, não podemos codificar um caractere japonês no `Latin-1` e não temos acesso a acentuação em `Shift-JIS`.
+O padrão ASCII era relativamente limitado, pois não suportava acentuações, caracteres japoneses, chineses, etc. Foi ai que surgiram diferentes codificações que buscavam adicionar mais caracteres ao padrão ASCII.
 
-Para isso foi criado um padrão conhecido como [`Unicode`](https://home.unicode.org/), que busca uma representação universal para todo e qualquer caractere. O padrão `Unicode` gerou 3 tipos de codificações, `UTF-8`, `UTF-16` e `UTF-32`, que usam, respectivamente, 1 byte, 2 bytes ou 4 bytes por código (`code unit`).
+Vários padrões surgiram extendendo ASCII, como `Latin-1`, `Shift-JIS`, entre outros. O problema é que essas novas codificações não conversavam entre sí, de forma que não fosse possível codificar um caractere japonês em `Latin-1` e não haja acentuação em `Shift-JIS` e um mesmo valor númerico representasse coisas diferentes em cada codificação.
 
-Onde : 
-- `UTF-8` é compatível com ASCII e usa 1 byte por code unit, valores além dos caracteres ASCII, podendo usar de 1 a 4 `code units` por caractere.
-- `UTF-16` utiliza 2 bytes por `code unit`, sendo necessário 2 `code units` para representar alguns caracteres.
-- `UTF-32` utiliza sempre 4 bytes mas representa qualquer caractere em um `code unit`.
+Para solucionar o problema dos formatos incompatíveis, surgiu o padrão conhecido como [`Unicode`](https://home.unicode.org/), que buscava uma representação universal para todo e qualquer caractere.
+
+Foi então que, em 1993, surgiram as codificações `UCS-2` e `UCS-4`, usando respectivamente 16bits e 32bits para representar caracteres e sem nenhum mecanismo para usar mais de um `code unit` por caractere, muitos acreditaram que 16bits seria o suficiente para representar todos caracteres, levando a grande adoção do padrão `UCS-2`, inclusive de várias gigantes da tecnologia como Apple (MacOs, iOs), Sun (Java), Microsoft (Windows) que participavam do consórcio Unicode que definia os padrões Unicode.
+
+- `UTF-8`, surgiu em 1993, é um formato compatível com ASCII puro que usa 8bits por `code unit`, podendo ter de 1 a 4 `code units` por caractere
+- `UTF-16`, surgiu em 1996 como uma solução para aqueles que adotaram `UCS-2`, é um formato que usa 16bits por `code unit`, podendo ter de 1 a 2 `code units` por caractere
+- `UTF-32`, é um sinônimo do formato `UCS-4`, onde cada `code unit` ocupa 32bits e representa qualquer caractere 
+
+É por estes motivos históricos, a grande adoção de `UCS-2`, que ainda hoje, muitos softwares e linguagens de programação utilizam `UTF-16`, mesmo que o formato `UTF-8` seja mais compacto e eficiente. Agravado pelo fato que muitos sistemas e linguagens novas escolhem usar `UTF-16` ainda hoje, pelo simples fato que sistemas com os quais eles desejam comunicar ou operar ainda estão usando `UTF-16`.
+
+### Unicode
+Os caracteres do padrão Unicode são dividos em "planos" e "blocos", cada plano é uma divisão de 65536 valores divididos em vários "blocos" que servem como categorias.
+
+O valor númerico de caracteres Unicode geralmente são expressados com o prefixo `U+` seguido de um número em hexadecimal, logo `U+00A0` representa o caractere Unicode cujo código númerico é o número hexadecimal `A0`, esses valores são denominados `code points`.
+
+A faixa de valores do Unicode é definido como de `U+0000` até `U+10FFFF`, utilizando efetivamente 21 bits. Um site bom para consultar os caracteres disponíveis no Unicode é o [Compart](https://www.compart.com/en/unicode/).
+
+Inclusive, por questões de compatibilidade, os valores na faixa de `U+0000` até `U+00FF` representam os mesmos caracteres do encoding `Latin-1`.
+
+Todos os encodings que respeitam o padrão Unicode, tentam representar os mesmos valores númericos. Logo, o que muda entre os diferentes encodings é a forma de extrair o valor númerico ou como ocorre no caso do `UCS-2` (que é considerado obsoleto), uma impossibilidade de representar todos caracteres.
+
+#### UTF-8
+
+O formato `UTF-8` codifica os valores dos `codepoints` Unicode da seguinte forma (considerando `U+uvwxyz`) : 
+
+| Faixa de codepoints   | Byte 1   | Byte 2   | Byte 3   | Byte 4   |
+| --------------------- | -------- | -------- | -------- | -------- |
+| U+0000 até U+007F     | 0yyyzzzz |          |          |          |
+| U+0080 até U+07FF     | 110xxxyy | 10yyzzzz |          |          |
+| U+0800 até U+FFFF     | 1110wwww | 10xxxxyy | 10yyzzzz |          |
+| U+010000 até U+10FFFF | 11110uvv | 10vvwwww | 10xxxxyy | 10yyzzzz |
+
+
+Nem todos os bits de cada byte são utilizados como valor efetivo, isso permite uma retrocompatibilidade com ASCII. Permitindo que você busque por caracteres ASCII como `\n` usando funções como `strchr` dentro de uma string `UTF-8`, sem medo de cair num pedaço que é usado para representar um caractere que precisa de 2,3 ou 4 bytes.
+
+Para iterar "por caracteres" em uma string `UTF-8`, devemos extrair os `codepoints` da string, o código abaixo implementa isso : 
+```c
+#include <stdio.h>
+#include <uchar.h>
+#ifdef _WIN32
+    #include <Windows.h>
+#endif
+
+/* Extrai um codepoint e avança a string para o próximo caractere */
+static char32_t utf8_next_codepoint(const char **text)
+{
+    const char* ptr    = *text;
+    char32_t codepoint = '\0';
+    int size;
+
+    if ((ptr[0]&0xF8) == 0xF0) {
+        if (((ptr[1]&0xC0)^0x80) || ((ptr[2]&0xC0)^0x80) || ((ptr[3]&0xC0)^0x80))
+            return codepoint;
+        codepoint = ((ptr[0]&0x07) << 18) | ((ptr[1]&0x3F) << 12) | 
+                    ((ptr[2]&0x3F) << 6) | (ptr[3]&0x3F);
+        size = 4;
+    } else if ((ptr[0]&0xF0) == 0xE0) {
+        if (((ptr[1]&0xC0)^0x80) || ((ptr[2]&0xC0)^0x80))
+            return codepoint;
+        codepoint = ((ptr[0]&0x0F) << 12) | ((ptr[1]&0x3F) << 6) | (ptr[2]&0x3F);
+        size = 3;
+    } else if ((ptr[0]&0xE0) == 0xC0) {
+        if ((ptr[1]&0xC0)^0x80)
+            return codepoint;
+        codepoint = ((ptr[0]&0x1F) << 6) | (ptr[1]&0x3F);
+        size = 2;
+    } else {
+        codepoint = ptr[0];
+        size = 1;
+    }
+    *text += size;
+    return codepoint;
+}
+
+/* Converte o codepoint para UTF-8 */
+static int codepoint_to_utf8(char32_t codepoint, char *utf8)
+{
+    int size;
+    if(codepoint <= 0x007F) {
+        utf8[0] = (char)codepoint;
+        size = 1;
+    } else if(codepoint <= 0x07FF) {
+        utf8[0] = 0xC0 | (codepoint >> 6);
+        utf8[1] = 0x80 | (codepoint & 0x3F);
+        size = 2;
+    } else if(codepoint <= 0xFFFF) {
+        utf8[0] = 0xE0 | (codepoint >> 12);
+        utf8[1] = 0x80 | ((codepoint >> 6) & 0x3F);
+        utf8[2] = 0x80 | (codepoint & 0x3F);
+        size = 3; 
+    } else if(codepoint <= 0x10FFFF) {
+        utf8[0] = 0xF0 | (codepoint >> 18);
+        utf8[1] = 0x80 | ((codepoint >> 12) & 0x3F);
+        utf8[2] = 0x80 | ((codepoint >> 6) & 0x3F);
+        utf8[3] = 0x80 | (codepoint & 0x3F);
+        size = 4;
+    } else { 
+        size = 0;
+    }
+    return size;
+}
+
+int main()
+{
+    #ifdef _WIN32 /* Necessário no Windows para configurar 
+                     saída do terminal para UTF-8 */
+        SetConsoleOutputCP(CP_UTF8);
+    #endif
+
+    const char *text = (u8"💻: Olá humano");
+    char32_t codepoint;
+    while(codepoint = utf8_next_codepoint(&text)) {
+        char utf8[5] = {0}; //4 bytes no máximo por codepoint + '\0'
+        codepoint_to_utf8(codepoint, utf8);
+
+        printf("%s = U+%04X\n", utf8, codepoint);
+    }
+}
+```
+
+#### UTF-16
+
+O formato `UTF-16` é similar ao `UTF-8`, porém utiliza 16bits por `code unit`. A principal vantagem para uso do `UTF-16` é que na maioria dos casos, os caracteres usados para suportar múltiplas línguas fazem parte do plano Unicode `BMP` (Basic Multilingual Plane, ou no português  Plano Multilíngue Básico) que podem ser representados por um único `code unit` em `UTF-16`, permitindo que na maioria dos casos, a quantidade de `code units` seja igual a quantidade de `code points`.
+
+Porém, como na maioria dos casos os caracteres mais utilizados são os presentes no padrão ASCII, o formato `UTF-8` acaba sendo mais eficiente na maior parte dos casos, exceto na representação de alguns caracteres japonêses e chineses, onde o formato `UTF-8` usa 3 bytes e o `UTF-16` usa 2.
+
+Para representação dos `codepoints` Unicode, o `UTF-16` utiliza as seguintes conversões : 
+
+Valores na faixa `U+0000` até `U+D7FF` e na faixa `U+E000` até `U+FFFF` são representados por um único `code unit` em `UTF-16`, a faixa `U+D800` até `U+DFFF` tem um propósito especial.
+
+Para representar valores na faixa de `U+010000` até `U+10FFFF` são utilizados o que chamamos de par substituto (ou no inglês "surrogate pair"), onde seguimos a sequência de decodificação : 
+- `0x10000` é subtraido do `codepoint`, de forma que sobre um número de 20bits na faixa de `0x00000–0xFFFFF`.
+- Os 10 bits mais significativos desse número (na faixa `0x000-0x3FF`) são adicionados ao número `0xD800` para formar o primeiro `code unit` na faixa `0xD800-0xDBFF`
+- Os 10 bits menos significativos desse número (na faixa `0x000-0x3FF`) são adicionados ao número `0xDC00` para formar o segundo `code unit` na faixa `0xDC00-0xDFFF`
+
+```c
+#include <stdio.h>
+#include <uchar.h>
+
+static char32_t utf16_next_codepoint(const char16_t **text)
+{
+    const char16_t* ptr = *text;
+    char32_t codepoint  = '\0';
+
+    if(*ptr <= 0xD7FF || *ptr >= 0xE000) {
+        codepoint = *ptr;
+        *text += 1;
+    } else if(*ptr >= 0xD800 && *ptr <= 0xDBFF) { //UTF16LE (little endian)
+        codepoint = 0x10000 + ((*ptr - 0xD800) << 10) + (ptr[1] - 0xDC00);
+        *text += 2;
+    } else if(*ptr >= 0xDC00 && *ptr <= 0xDBFF) { //UTF16BE (big endian)
+        codepoint = 0x10000 + ((*ptr - 0xDC00) << 10) + (ptr[1] - 0xD800);
+        *text += 2;
+    }
+    return codepoint;
+}
+
+int main()
+{
+    const char16_t *text = u"💻: Olá humano";
+    char32_t codepoint;
+    while(codepoint = utf16_next_codepoint(&text))
+        printf("Codepoint = U+%04X\n", codepoint);
+}
+```
+
+#### UTF-32
+O formato `UTF-32` é bastante simples, todos seus `code units` representam exatamente um `codepoint` Unicode, logo ele tem exatamente os mesmos valores e não há necessidade de conversão.
+
+Podemos dizer que o `UTF-32` seria basicamente o `UTF-8` ou `UTF-16` "descomprimido", onde a única vantagem é o acesso `O(1)` a qualquer caractere, dado um array de caracteres em `UTF-32`, com a desvantagem do uso de memória adicional, que pode também prejudicar a performance.
+
+O formato se tornou sinônimo de `UCS-4`, pois na época da formulação o `UCS-4` era definido como tendo até 31bits reservados para caracteres, enquanto o `UTF-32` foi concebido tendo a faixa de valores `U+0000` até `U+10FFFF` de 21bits, mais tarde ambos foram padronizados como sinônimos (onde `UCS-4` passou a ter a mesma definição).
 
 ### Tipos de strings literais
 
@@ -139,6 +306,9 @@ str3 = "abcdef"         //Errado, isso só funciona na inicialização
 //Essa é uma das formas de copiar a string (usando a função strcpy)
 strcpy(str3, "abcdef"); 
 
+//Ou com a própria função memcpy
+memcpy(str3, "abcdef", sizeof("abcdef"));
+
 //Neste caso, temos 'g','h','i','\0' no conteúdo, porém temos mais espaço reservado
 //para expandir e colocar mais coisas na string caso necessário...
 char str4[20] = "ghi"; 
@@ -151,7 +321,7 @@ struct {
 ```
 
 ## Segurança das funções de strings
-Devido a idade da linguagem C, existem muitas funções que são consideradas "não ideais" para tratar strings pois são suscetíveis a erros, para isso alguns projetos como [`git`](https://github.com/git/git/blob/0d42fbd9a1f30c63cf0359a1c5aaa77020972f72/banned.h#L4) ou [engenheiros de segurança da Microsoft](https://github.com/x509cert/banned) mantêm um header com uma lista de funções "banidas", que causa um erro de compilação caso alguém tente usar elas.
+Devido a falta de consideração pela segurança no design inicial da linguagem C, existem muitas funções que são consideradas "não ideais" para tratar strings pois são suscetíveis a erros, para isso alguns projetos como [`git`](https://github.com/git/git/blob/0d42fbd9a1f30c63cf0359a1c5aaa77020972f72/banned.h#L4) ou [engenheiros de segurança da Microsoft](https://github.com/x509cert/banned) mantêm um header com uma lista de funções "banidas", que causa um erro de compilação caso alguém tente usar elas.
 
 Utilizar essas funções não necessariamente significa que você tem um problema de segurança, mas basta um erro no seu uso para elas se TORNAREM um problema de segurança.
 
@@ -550,18 +720,18 @@ O novo formato sempre tem o campo `compact` como `1`, neste caso, se a codifica�
 Isso ocorre pois os campos `utf8_length` e `utf8` são utilizados apenas quando um código em C chama uma API para "pedir" a string para o Python e são preenchidos ao realizar a conversão e mantidos como cache, porém quando a codificação é `ASCII` essa conversão é desnecessária (pois podemos considerar uma string `UTF-8` como superset de `ASCII`).
 
 Vantagens:
-- Facilidade de encontrar o tamanho em caracteres de qualquer string
+- Facilidade de encontrar o tamanho em caracteres e bytes de qualquer string
+- Mantêm a representação mais compacta que ainda permita acesso `O(1)` para qualquer caractere
 - Uso reduzido de memória em algumas representações, apesar de questionável em outras
-- Mantêm 1 caractere por `code unit` com a representação mais leve (de forma que `length` sirva como ambos tamanhos)
 - Relativamente trivial de embarcar strings ASCII usando o formato legado
-- Localidade de cache (pois basta pasar um ponteiro no novo formato)
+- Localidade de cache (pois basta passar um ponteiro no novo formato)
 
 Desvantagens:
 - Header relativamente grande, com vários campos que podem não ser utilizados
 - Uso de memória considerável ao representar certos caracteres, que poderiam estar em `UTF-8`
 - Extremamente confuso, usar strings UTF-8 diretamente e manter um cache do tamanho em caracteres poderia ser mais eficiente
 - Na maioria dos casos é necessário alocar uma string nova, pois é muito difícil ou impossível embarcar a maioria das strings
-- Extremamente ineficiente comparado com outros formatos que codificam o header na string
+- Extremamente ineficiente em tamanho comparado com outros formatos que codificam o header na string
 - Necessidade de ter vários códigos diferentes para ler os diferentes formatos, ou converter para um formato em comum
 
 {{#endtab }}

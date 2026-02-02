@@ -165,8 +165,8 @@ L"T5"  //wchar_t*
 
 ## Literais extras
 Desde o `C23` : 
-- `true` e `false` foram introduzidos como palavras chave da linguagem e tem efetivamente o tipo `bool`.
-- `nullptr` foi introduzido como palavra chave da linguagem e tem efetivamente o tipo `nullptr_t`.
+- `true` e `false` foram introduzidos como palavras chave da linguagem e tem efetivamente o tipo `bool`, onde `true` é implicitamente convertido para `1` e `false` implicitamente convertido para `0` quando repassado a um tipo inteiro.
+- `nullptr` foi introduzido como palavra chave da linguagem e tem efetivamente o tipo `nullptr_t`, que pode ser implicitamente convertido para um ponteiro nulo de qualquer tipo de ponteiro.
 
 ## Literais Compostos
 Desde o `C99`, podemos escrever literais compostos, que são utilizados para escrever valores literais para qualquer tipo que podem ser usados como `lvalue`.
@@ -239,4 +239,4 @@ gstr = (struct GString) {
 (const char[]){"abc"} == "abc";
 ```
 
-No geral, todos os literais compostos criados dentro de algum bloco tem [`duração automática`](./4-00-variaveis.md#modificadores-de-armazenamento) e fora de blocos no escopo global tem [`duração estática`](./4-00-variaveis.md#modificadores-de-armazenamento) a menos que utilizemos o modificador `static` para forçar `duração estática`.
+No geral, todos os literais compostos criados dentro de algum bloco tem [`duração automática`](./4-00-variaveis.md#modificadores-de-armazenamento) (a menos que utilizemos o modificador `static` que força a `duração estática`) e fora de blocos no escopo global tem [`duração estática`](./4-00-variaveis.md#modificadores-de-armazenamento).

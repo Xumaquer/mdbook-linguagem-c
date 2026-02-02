@@ -209,9 +209,9 @@ No exemplo acima, o `goto` foi utilizado para executar um código em comum na fi
 
 ## Sobre o uso de goto
 
-O `goto` é ideal nos casos onde há tratamento de erros, necessidade de executar um código em comum na finalização, sair de vários loops aninhados e talvez em alguns outros usos especificos que não saberei citar aqui.
+O `goto` é ideal nos casos onde há tratamento de erros, necessidade de executar um código em comum na finalização, sair de vários loops aninhados e talvez em alguns outros usos especificos que não saberei citar aqui, inclusive vários projetos de renome como o próprio kernel do Linux usam `goto` extensivamente pelos propósitos citados aqui.
 
-Porém, muitos professores de faculdade ou de cursos técnicos tem uma tendência a dizer fortemente "Não usem goto", como se isso fosse uma regra que deve ser seguida sempre e por todos.
+Porém, muitos professores de faculdade ou de cursos técnicos tem uma tendência a dizer fortemente "Não usem goto", como se isso fosse uma regra que deve ser seguida sempre e por todos, inclusive muitos chegam a descontar nota caso descubram que "o aluno usou `goto` no programa".
 
 A motivação é clara, normalmente ao analisar um programa, basta ver as chaves, identação, e facilmente podemos visualizar o fluxo de um programa, porém a possibilidade de utilizar `goto` pode contrariar isso, ainda mais se o usarmos de forma indiscriminada e colocarmos `goto`s que voltam linhas de código, pulam inicialização de variaveis, etc.
 

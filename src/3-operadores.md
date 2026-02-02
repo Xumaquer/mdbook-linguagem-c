@@ -196,7 +196,7 @@ Logo caso o primeiro valor já seja o suficiente para estabelecer o resultado da
 ```
 
 ## Operadores Bit a Bit 
-Antes de olhar esta parte sobre operadores bit a bit, aconselho fortemente que veja o capítulo sobre [Números Binários](#x-01-numeros-binarios.md), ou deixe este pedaço para depois.
+Antes de olhar esta parte sobre operadores bit a bit, aconselho fortemente que veja o capítulo sobre [Números Binários](./x-01-numeros-binarios.md), ou deixe este pedaço para depois.
 
 Assume-se ao menos um conhecimento acerca de números binários e que o leitor saiba o que são BITS.
 
@@ -474,3 +474,41 @@ Os itens mais no topo da tabela a seguir, são os itens de maior prioridade (ord
 > No geral muitos programadores utilizam parenteses para forçar uma certa ordem de precedência.
 > Isso diminui a necessidade de um estudo mais minucioso dessa tabela, ao mesmo tempo que facilita a leitura do código
 > para pessoas que não a decoraram, ou que tem pouca experiência
+
+## Ordem de Avaliação
+A ordem de avaliação se refere a ordem com que as operações acontecem, a ordem com que os valores de variáveis são lidos.
+
+No geral, na linguagem C, a ordem com que argumentos de função e subexpressões dentro de uma expressão são avaliadas não é especificada, permitindo que o compilador reordene as operações como desejar (lembrando que nesses casos, a decisão de como o compilador vai ordenar as expressões pode mudar dependendo do nível de otimização especificado).
+
+A verdade é que não existe um conceito de "avaliação da esquerda para direita" ou "avaliação da direita para esquerda" como normalmente encontramos em matemática, as ordens são normalmente definidas pelo próprio compilador.
+
+Um exemplo seria a avaliação de `f1() + f2() + f3()`, por conta do operador `+` ser associado com as expressões a sua esquerda e direita, teremos o equivalente a `(f1() + f2()) + f3()`, porém, a avaliação de `f3()` pode ocorrer antes de `(f1() + f2())`.
+
+A dica é, jamais dependa de uma ordem que o compilador pode mudar, faça seu programa de forma que operações que tem o mesmo nível de prioridade, resultam no mesmo valor independente da ordem em que sejam realizadas, caso não seja possível, separe a expressão em mais linhas de código para garantir a ordem de operações desejada.
+
+### Pontos de sequência
+Normalmente referenciados em inglês, como "sequence points", se referem a partes do código que garantem que os efeitos colaterais anteriores devem finalizar antes de prosseguir, pontos de sequência servem como "separadores" que garantem a ordem das expressões, sem eles poderiamos ter várias expressões que podem ser realizadas em qualquer ordem.
+
+Os operadores, pontuadores e palavras chaves que servem como pontos de sequência : 
+- O pontuador `;` garante que a expressão antes dele finalize antes de prosseguir.
+- O operador `&&` garante que a expressão a esquerda dele finalize antes de avaliar a expressão a direita dele.
+- O operador `||` garante que a expressão a esquerda dele finalize antes de avaliar a expressão a direita dele.
+- O operador `,`  garante que a expressão a esquerda dele finalize antes de avaliar a expressão a direita dele.
+- Numa chamada de função, todos os argumentos são avaliados antes da chamada de função realmente ocorrer.
+- O operador `?` garante que o primeiro argumento de `condição` seja avaliado antes dos outros 2 (`expressao-se-verdade` e `expressao-se-falso`).
+- O fim da uma inicialização de variavel, garante que todas expressões usadas para inicializar a variavel sejam finalizadas.
+- A expressão dentro de um `if` ou `switch` é avaliada antes de prosseguir.
+- A expressão de controle em um `while` ou `do while` é avaliada antes de repetir o laço.
+- As três expressões do `for`, quando avaliadas, sempre terminam antes da execução da próxima iteração.
+- A expressão utilizada com a palavra chave `return`, é completamente avaliada antes da função retornar.
+
+Um exemplo que podemos usar ao nosso favor para entender melhor os pontos de sequência, é a regra que mais de um efeito colateral numa mesma variavel não pode ocorrer sem um ponto de sequência entre eles:
+```c
+int i = 0;
+i++ + i++;   //Vai contra as regras do C (comportamento indefinido)
+++i - ++i;   //Também vai contra, nesse caso a resposta depende do compilador (pois o compilador é livre pra reordenar as operações)
+
+i++ || i++;  //Permitido, pois o "||" forma um ponto de sequência entre as operações
+i++,i++;     //Também é permitido
+i++;i++;     //Permitido, pois o ";" separa ambos 
+```

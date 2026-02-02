@@ -211,6 +211,30 @@ No exemplo acima, o código no `arquivo2.c` importa a função presente no `arqu
 
 De forma que esse código só funcione se ambos forem compilados juntos.
 
+## Diferença entre f() e f(void)
+Até antes do `C23`, declarar uma função com `f()` é diferente de declarar uma função como `f(void)`, `f()` representa uma função que aceita um número qualquer de argumentos enquanto `f(void)` representa uma função que não aceita argumentos.
+
+Lembrando que esses detalhes só servem para a DECLARAÇÃO da função, mas na DEFINIÇÃO, `f()` ainda representa uma função que não aceita argumentos.
+
+O código abaixo exemplifica isso:
+```c
+void f(); //Declaração, aceita qualquer número de argumentos
+f(2);     //Permitido
+
+void f(void); //Declaração, não aceita argumentos
+f(2);         //Erro de compilação
+
+//Definição, não aceita argumentos
+void f() {
+
+}
+
+//Definição, também não aceita argumentos
+void f(void) {
+
+}
+```
+
 ## Funções variádicas
 Funções variádicas são funções que tem a capacidade de receber um número variável de argumentos.
 

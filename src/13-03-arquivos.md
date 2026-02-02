@@ -45,7 +45,7 @@ A biblioteca `stdio.h` fornece algumas funções que podemos utilizar para inter
 
 Um arquivo em C normalmente é descrito pelo tipo `FILE*`, que é um ponteiro para um tipo de dado que pode ser diferente em cada sistema operacional ou ambiente, sendo aconselhável que o usuário evite acessar diretamente seus campos e prefira utilizar funções para operar com o `FILE*`.
 
-O tipo `FILE*` descreve um "fluxo de arquivos", ou no inglês "file stream", ele é chamado de fluxo pois indica um fluxo para escrita e/ou leitura de bytes, onde cada operação de leitura ou escrita avança a posição no fluxo, que é chamada de posição do arquivo.
+O tipo `FILE*` descreve um "fluxo de bytes", ou no inglês "byte stream", ele é chamado de fluxo pois indica um fluxo para escrita e/ou leitura de bytes, onde cada operação de leitura ou escrita avança a posição no fluxo que também pode ser chamado de "posição do arquivo".
 
 A ideia de utilizar um fluxo de arquivos para ler um arquivo "aos poucos", também permite que seja possível ler de arquivos com gigabytes de tamanho sem consumir muita memória, lendo pequenos pedaços por vez e processando os dados conforme são lidos.
 
@@ -194,9 +194,9 @@ Os prefixos antes da palavra `scanf` nas funções indicam:
 - `f`: Indica que a função lê de um `FILE*`, quando o prefixo não está presente, significa que ela utiliza a `stdin` (Entrada padrão)
 - `s`: Indica que a função lê de uma string na memória ao invés de um `FILE*`
 - `w`: Indica que a função lê uma entrada no formato `wchar_t` ao invés de `char`
-- `v`: Indica que a função aceita um `va_list` ao invés de argumentos variádicos
+- `v`: Indica que a função aceita um `va_list`
 
-Todas as funções aceitam um parâmetro de `formato` e argumentos variádicos ou `va_list` com os endereços dos parâmetros que serão preenchidos pela função, a ideia das funções de `scan` é extrair dados de uma string ou arquivo de texto num formato qualquer.
+Todas as funções aceitam um parâmetro de `formato` e um número variáveis de argumentos ou `va_list` com os endereços dos parâmetros que serão preenchidos pela função, a ideia das funções de `scan` é extrair dados de uma string ou arquivo de texto num formato qualquer.
 
 Os dados só são extraidos se o padrão colocado no formato bate com o padrão no texto lido/fornecido, de forma que as funções de `scan` funcionem como um [Regex](https://blog.dp6.com.br/regex-o-guia-essencial-das-express%C3%B5es-regulares-2fc1df38a481) mais primitivo. Se algum caractere/formato não bater, a função falha imediatamente e mantêm o que não foi consumido como pendente no buffer de leitura (caso esteja lendo de um arquivo).
 
@@ -328,17 +328,34 @@ printf("%.3e\n", n3); //Escreve "5.245e+03\n"
 
 Normalmente, as funções retornam o número de caracteres escritos ou um número negativo caso algum erro ocorra durante a escrita ou conversão de valores.
 
-Nas funções que aceitam o prefixo `n` como `snprintf`, o valor retornado é o tamanho que a saída teria se toda ela pudesse ser escrita e não a quantidade que realmente foi escrita,
-dessa forma, também podemos utilizar `NULL` no buffer e `0` no tamanho para descobrir quantos caracteres são necessários para guardar o resultado.
+Nas funções que aceitam o prefixo `n` como `snprintf`, o valor retornado é o tamanho que a saída teria se toda ela pudesse ser escrita e não a quantidade que realmente foi escrita, dessa forma, também podemos utilizar `NULL` no buffer e `0` no tamanho para descobrir quantos caracteres são necessários para guardar o resultado.
 
-A função `snprintf` também é útil para concatenar vários valores formatados numa string, o exemplo abaixo usa a função `snprintf` para concatenar valores e montar uma requisição HTTP:
+O comportamento da `snprintf` mencionado acima também já foi [fonte de bugs no kernel do Linux](https://patchew.org/linux/20250722115017.206969-1-a.jahangirzad@gmail.com/), onde decidiram mudar a função `snprintf` para uma nomeada `scnprintf` onde a quantidade de bytes retornados é a que realmente foi escrita e não a quantidade "que seria escrita se o buffer tivesse espaço suficiente", essa função não é padrão do C, apesar de estar presente em sistemas POSIX, mas é muito fácil de implementá-la.
+
+A função `scnprintf` também é útil para concatenar vários valores formatados numa string, o exemplo abaixo implementa a `scnprintf` usando a `snprintf` para concatenar valores e montar uma requisição HTTP:
 ```c
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
 #define STR_AND_SIZE(X) X,sizeof(X)-1
 
 size_t memcat(void *dst, const void *src, size_t size)
 {
     memcpy(dst, src, size);
     return size;
+}
+
+int scnprintf(char *restrict buffer, size_t bufsz, const char *restrict format, ...) 
+{
+    va_list list;
+    size_t needsz;
+    
+    va_start(list, format); 
+    needsz = vsnprintf(buffer, bufsz, format, list);
+    va_end(list);
+
+    return (needsz <= bufsz) ? needsz : bufsz;
 }
 
 void enviaValores(SOCKET sock, struct Dados *dados) 
@@ -351,9 +368,9 @@ void enviaValores(SOCKET sock, struct Dados *dados)
                      "Content-Type: application/x-www-form-urlencoded\r\n"
                      "\r\n"));
 
-    bufpos += snprintf(bufpos, sizeof(buffer) - (size_t)(bufpos - buffer),
-                       "Nome=%512s&cidade=%512s&idade=%d", 
-                       dados->nome, dados->cidade, dados->idade);
+    bufpos += scnprintf(bufpos, sizeof(buffer) - (size_t)(bufpos - buffer),
+                        "Nome=%512s&cidade=%512s&idade=%d", 
+                        dados->nome, dados->cidade, dados->idade);
 
     send(sock, buffer, (int)(size_t)(bufpos - buffer), 0);
 }
@@ -594,7 +611,7 @@ Ainda existem 3 bits extras que podem ser definidos:
 
 O comando `sudo` nos sistemas UNIX permite que usuários executem processos com permissões de super usuário (`root`), funciona utilizando o bit `S_ISUID` em um arquivo cujo dono é o próprio `root` mas que pode ser executado por qualquer usuário, realizando uma validação de senha antes de efetivamente executar o comando solicitado.
 
-As permissões de arquivo podem ser especificadas ao criar o arquivo com a função `open` ou modificadas diretamente com a função `chmod` (que também é o nome da ferramenta de terminal que executa a mesma tarefa).
+As permissões de arquivo podem ser especificadas ao criar o arquivo com a função `open` e modificadas diretamente com a função `chmod` (que também é o nome da ferramenta de terminal que executa a mesma tarefa).
 
 Esse sistema de permissões simplificado permite que usuários e programas tenham um controle mais acessível das permissões.
 

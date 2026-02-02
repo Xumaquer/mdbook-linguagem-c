@@ -20,6 +20,8 @@ char *const d; //Ponteiro constante para caractere
 -  `modificadores` são opcionais e indicam modificadores como `const`, `restrict`, `volatile`, etc.
 - `nome` indica o nome da variavel criada ou outro `*`.
 
+Lembrando que modificadores antes do asterisco, afetam o dado (ex: `const char*` = ponteiro modificável para dado constante) e após o asterisco afetam o ponteiro em sí (ex: `char *const`= ponteiro constante para dado modificável).
+
 ## Explicação 
 Um ponteiro atua guardando um "endereço de memória", que pode ser utilizado para ler e escrever em outras variaveis ou no caso de ponteiros de função, executá-las.
 
@@ -108,8 +110,14 @@ ptr++;   //Permitido, agora ptr[0] modificará array[1]
 
 ptr[0] = 30; //Modifica array[1] devido ao incremento do ponteiro
 ptr--;       //Permitido, agora ptr[0] novamente modificará array[0]
-```
 
+//Existe uma outra diferença quanto a arrays
+//Usar o operador & faz com que recebamos um ponteiro para array
+array;  //Equivale a "int*"
+&array; //Equivale a "int(*)[10]"
+ptr;    //Equivale a "int*"
+&ptr;   //Equivale a "int**"
+```
 
 Basicamente, ponteiros tem um comportamento similar a arrays, porém o operador `sizeof` relatará o tamanho de um ponteiro e podemos somar/subtrair da variável do ponteiro para avançar/retroceder elementos.
 
@@ -340,7 +348,10 @@ Uma das regras mais violadas e mal entendidas do C é a regra de `strict aliasin
 As exceções para essa regra são : 
 - Se o tipo `T2` for `char`, `signed char` ou `unsigned char`, pois os tipos de "caractere" são efetivamente considerados pela linguagem como tipos especiais próprios para manipular bytes.
 - O tipo `T1` e o tipo `T2` são variações com e sem sinal do mesmo tipo.
-- O tipo `T2` é um `union` que contêm o tipo `T1`.
+- `T1` seja uma `struct` onde o primeiro elemento é do tipo `T2`
+- `T1` seja um `union` e o último elemento escrito nele seja do tipo `T2`, lembrando que acessá-lo por um ponteiro para `T2` só será válido enquanto a ultima escrita em `T1` ainda for em um membro cujo tipo seja `T2`.
+
+No casos onde uma variável do tipo `T1` é um `union` que contêm o tipo `T2`, mas o último elemento escrito nela não é do tipo `T2`, o acesso via ponteiro de `T2` apontando para essa variável só pode ser realizado usando a própria variavel que é `T1` ou um ponteiro para ela que seja do tipo `T1`.
 
 O exemplo abaixo demonstra dois acessos, um inválido e um válido, seguindo essas regras:
 ```c
@@ -396,13 +407,13 @@ A diferença parece incrivelmente sutil, mas essa regra permite que o compilador
 
 Em contrapartida, quando a regra não se aplicar, os compiladores de C são proibidos de realizarem esse tipo de otimização, dependendo do uso manual da palavra chave `restrict`.
 
-Em alguns casos, a única forma de realizar um cast de ponteiros e ainda respeitar essa regra é realizar uma cópia dos dados via `memcpy` ou depender de extensões de compiladores, motivo pelo qual muitos desenvolvedores, inclusive Linus Torvalds o criador do linux, criticam muito a existência e motivação da regra. 
+Em alguns casos, a única forma de realizar um cast de ponteiros e ainda respeitar essa regra é realizar uma cópia dos dados via `memcpy` ou depender de extensões de compiladores, motivo pelo qual muitos desenvolvedores, inclusive Linus Torvalds o criador do Linux, criticam muito a existência e motivação da regra. 
 
-Lembrando que mesmo ao utilizar `memcpy`, muitos compiladores modernos consideram a função como uma operação inerente da linguagem e percebem sua intenção em usar ela no lugar de um cast, não realizando efetivamente uma cópia no código final.
+Lembrando que mesmo ao utilizar `memcpy`, muitos compiladores modernos consideram a função como uma operação inerente da linguagem e percebem sua intenção em usar ela no lugar de um cast, não realizando efetivamente uma cópia no código final, mas isso geralmente só acontece nas versões com otimização.
 
 Em muitos compiladores, as otimizações relacionadas a aliasing podem não estar presentes nas versões de debug/desenvolvimento, portanto se escrevermos um código que viole essas regras, ele pode funcionar durante os testes mas falhar na versão final com otimizações.
 
-Muitos compiladores também fornecem como extensão, uma forma de indicar "quando um ponteiro pode causar um aliasing proposital" ou opções de compilador como `-fno-strict-aliasing` que forçam o compilador a desconsiderar essa regra.
+Muitos compiladores também fornecem como extensão, uma forma de indicar "quando um ponteiro pode causar um aliasing proposital" ou opções de compilador como `-fno-strict-aliasing` que forçam o compilador a desconsiderar essa regra, o kernel do Linux e vários outros projetos usam essa opção e realizam controle manual dessa otimização pela palavra chave `restrict`.
 
 ## Usos de ponteiros
 Ponteiros podem ser utilizados para implementar uma série de funcionalidades e ao entender cada uma delas, teremos um entendimento mais completo do conceito de ponteiros.

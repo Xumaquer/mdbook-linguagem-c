@@ -346,10 +346,10 @@ for_each_ll(struct ListaEncadeada, item, lista) {
 {{#tab name="Depois do C23"}}
 ```c
 #define for_each_zero(ITEM, ARRAY) \
-    for(typeof(ARRAY) ITEM = ARRAY; *ITEM; ITEM++)
+    for(typeof(*ARRAY) *ITEM = ARRAY; *ITEM; ITEM++)
 
 #define for_each_ptr(ITEM, ARRAY, SIZE) \
-    for(typeof(ARRAY) ITEM = ARRAY; ITEM < (ARRAY + SIZE); ITEM++)
+    for(typeof(*ARRAY) *ITEM = ARRAY; ITEM < (ARRAY + SIZE); ITEM++)
 
 #define for_each_ll(ITEM, LINKEDLIST) \
     for(typeof(LINKEDLIST) ITEM = LINKEDLIST; *ITEM; ITEM = ITEM->proximo)
@@ -431,3 +431,60 @@ struct ImprimePdfParam {
 _imprimePdf(void *pdf, struct ImprimePdfParam opcoes) { /*Implementação*/}
 ```
 
+### Seletores de macro 
+No pedaço sobre [manipulação de argumentos de macro](#manipulação-de-argumentos-de-macro), vimos como o uso de uma segunda macro é necessária para transformarmos o "nome de uma macro" em seu valor expandido.
+
+Isso acontece pois é possível, repassar macros para outras macros. Existem formas de abusar dessa funcionalidade para implementar algumas coisas que geralmente não seriam possíveis.
+
+Uma dessas formas é o uso de "seletores de macro" onde misturamos macros com um número variável de argumentos com a possibilidade de usar macros como argumentos, permitindo o seguinte comportamento : 
+
+```c
+//Escolhe quais macros vão ser usadas dependendo do sistema
+#ifdef _WIN32
+    #define CAMINHO_EXPANDE_1(_1)                 _1
+    #define CAMINHO_EXPANDE_2(_1, _2)             _1"\\"_2
+    #define CAMINHO_EXPANDE_3(_1, _2, _3)         _1"\\"_2"\\"_3
+    #define CAMINHO_EXPANDE_4(_1, _2, _3, _4)     _1"\\"_2"\\"_3"\\"_4
+    #define CAMINHO_EXPANDE_5(_1, _2, _3, _4, _5) _1"\\"_2"\\"_3"\\"_4"\\"_5
+#else 
+    #define CAMINHO_EXPANDE_1(_1)                 _1
+    #define CAMINHO_EXPANDE_2(_1, _2)             _1"/"_2
+    #define CAMINHO_EXPANDE_3(_1, _2, _3)         _1"/"_2"/"_3
+    #define CAMINHO_EXPANDE_4(_1, _2, _3, _4)     _1"/"_2"/"_3"/"_4
+    #define CAMINHO_EXPANDE_5(_1, _2, _3, _4, _5) _1"/"_2"/"_3"/"_4"/"_5
+#endif 
+
+//Essa macro mantêm apenas o 6º elemento e descarta todos os outros
+#define SELETOR_5(_1, _2, _3, _4, _5, SELECIONADO, ...) SELECIONADO
+
+/* Seleciona uma macro, e depois chama ela com "__VA_ARGS__" */
+#define CAMINHO_ARQUIVO(...) SELETOR_5(__VA_ARGS__, CAMINHO_EXPANDE_5, CAMINHO_EXPANDE_4, \
+                                      CAMINHO_EXPANDE_3, CAMINHO_EXPANDE_2, \
+                                      CAMINHO_EXPANDE_1)(__VA_ARGS__)
+
+//"build"
+CAMINHO_ARQUIVO("build") 
+
+//"build/x64/executavel" no Linux e "build\\x64\\executavel" no Windows
+CAMINHO_ARQUIVO("build", "x64", "executavel") 
+```
+
+Vamos explicar passo a passo o que ocorre no caso de `CAMINHO_ARQUIVO("build", "x64", "executavel")` :
+- Expande-se `CAMINHO_ARQUIVO` para `SELETOR_5("build", "x64", "executavel", CAMINHO_EXPANDE_5, CAMINHO_EXPANDE_4, restante das macros)("build", "x64", "executavel")` 
+- `SELETOR_5` escolherá o 6º argumento e manterá apenas ele, nesse caso temos
+ - 1° "build"
+ - 2° "x64"
+ - 3° "executavel"
+ - 4° `CAMINHO_EXPANDE_5`
+ - 5° `CAMINHO_EXPANDE_4`
+ - 6° `CAMINHO_EXPANDE_3` (os 3 argumentos deslocaram para que essa macro seja a 6º)
+- Dessa forma `SELETOR_5(...)("build", "x64", "executavel")` expande para `CAMINHO_EXPANDE_3("build", "x64", "executavel")`
+- A macro `CAMINHO_EXPANDE_3` expande, dependendo do sistema operacional (assumindo Linux), `"buld""/""x64""/""executavel"`
+
+Vale lembrar que essa técnica assume que todos argumentos são strings literais, e não funciona com variaveis, pois depende do mecanismo de concatenação de strings literais.
+
+A vantagem dessa técnica é que ela permite manipulações complexas que normalmente não seriam possíveis e o problema é que é necessário escrever uma nova macro
+para cada número de argumento suportado (`x` argumentos = `x` macros).
+
+Recomenda-se evitar seu uso caso possível, mas segue como uma alternativa viável em alguns casos, como ao escrever caminhos de arquivo "portáveis" que funcionam em qualquer
+plataforma, sem necessidade de conversões em tempo de execução.

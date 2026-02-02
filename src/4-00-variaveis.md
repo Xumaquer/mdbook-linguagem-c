@@ -245,7 +245,7 @@ A duração, neste caso, é o escopo no qual a variável vai continuar existindo
 - `automática`: A variável é armazenada quando o bloco inicia e desalocada quando o bloco é encerrado, isso se aplica a variáveis locais e parâmetros de funções.
 - `estática`: A variável é armazenada durante toda a execução do programa, e o valor guardado no objeto é inicializado apenas uma vez, antes da execução da função `main`, isso se aplica a variáveis globais ou variáveis com `static` dentro de funções.
 - `thread`: A duração da variável é igual a duração do thread na qual ela foi criada e seu valor é inicializado quando o thread é inicializado.
-- `alocada`: A variável foi alocada dinâmicamente usando [alocação de memória dinâmica]() e pode ser desalocada a qualquer momento pelo próprio programa.
+- `alocada`: A variável foi alocada dinâmicamente usando [alocação de memória dinâmica](./13-02-alocacao-dinamica-de-memoria.md) e pode ser desalocada a qualquer momento pelo próprio programa.
 
 A vinculação, indica os locais onde a função ou variável é acessível e pode ser usada, para facilitar, é importante conhecermos o termo "unidade de tradução" do C.
 
