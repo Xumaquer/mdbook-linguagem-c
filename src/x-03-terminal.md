@@ -66,7 +66,7 @@ Como mencionado anteriormente, as linguagens de script para `shell` nasceram com
 Linguagens de script conhecidas : 
 - [`batch`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/windows-commands): Utilizada como a linguagem de script convencional do windows baseado no interpretador de comandos legado do DOS, aceitando arquivos de script em `.bat`, tem suporte a variáveis, `goto`, condicionais, loops.
 - [`Powershell`](https://learn.microsoft.com/en-us/powershell/): Linguagem de script avançada do Windows, com funcionalidades modernas e documentação extensa, orientada a objetos baseada na plataforma [`.NET`](https://learn.microsoft.com/en-us/dotnet/core/introduction).
-- [`bash`](https://www.gnu.org/software/bash/): Shell desenvolvido pelo projeto GNU e é o shell mais comum encontrado em distruições Linux, normalmente visto como o menor denominador comum, onde outros shells são utilizados quando novas funcionalidades são desejáveis.  
+- [`bash`](https://www.gnu.org/software/bash/): Shell desenvolvido pelo projeto GNU e é o shell mais comum encontrado em distribuições Linux, normalmente visto como o menor denominador comum, onde outros shells são utilizados quando novas funcionalidades são desejáveis.  
 - [`zsh`](https://wiki.archlinux.org/title/Zsh): Shell padrão utilizado no macOs mas também muito utilizado em distribuições Linux.
 - [`ksh`](https://linux.die.net/man/1/ksh): Um shell mais antigo bastante similar ao `bash`, a maioria dos sistemas UNIX que não são Linux como Solaris e outros usam o `ksh` como padrão, enquanto no Linux é mais comum o uso do `bash`.
 - [`sh`](https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html): É uma especificação do POSIX, normalmente servindo como atalho para o `shell` utilizado pelo sistema operacional, onde o `shell` efetivamente usado será outro, mas deve seguir as especificações, fornecendo uma interface comum similar a outras linguagens de `shell`.
@@ -99,7 +99,7 @@ cd C:\    #Entra no disco C:\ do windows
 
 As variáveis de ambiente do sistema normalmente podem ser acessadas como variáveis diretamente no `shell`, no `batch` uma variável pode ser acessada utilizando `%variavel%`, enquanto no `powershell`, `bash` e outros utilizando `$variavel`.
 
-Para criar novas variáveis, podemos utilizar `$variavel = valor` no `powershell`, `bash` e afins, enquanto para o `batch` é necessário preceder o comando com a palavra chave `set` (ex: `set variavel = valor`). 
+Para criar novas variáveis, podemos utilizar `$variavel = valor` no `powershell`, `variavel = valor` no `bash` e outros `shells` derivados do UNIX, enquanto para o `batch` é necessário preceder o comando com a palavra chave `set` (ex: `set variavel = valor`). 
 
 É normal que ao procurar por programas para executar com um comando, o `shell` procure em todas pastas listadas na variável de ambiente `PATH`, que indica caminhos adicionais que devem ser buscados.
 
@@ -128,10 +128,11 @@ Para redirecionar saídas e entradas, podemos utilizar :
 - `>` : Redireciona a saída (`stdout`)
 - `<` : Redireciona a entrada (`stdin`)
 - `2>`: Redireciona a saída de erros (`stderr`)
-- `&>`: Redireciona a saída normal e de erros (`stdout` e `stderr`)
+- `&>`: Redireciona a saída padrão e de erros (`stdout` e `stderr`)
 - `>>`: Redireciona a saída no modo `append`, onde dados são adicionados ao fim do arquivo (`stdout`)
 - `2>>`: Redireciona a saída de erros no modo `append` (`stderr`)
-- `&>>`: Redireciona a saída normal e de erros no modo `append` (`stdout` e `stderr`)
+- `&>>`: Redireciona a saída padrão e de erros no modo `append` (`stdout` e `stderr`)
+- `2>&1`: Redireciona a saída de erros para a saída padrão (`stderr` > `stdout`)
 - `|`: Faz com que a saída do primeiro programa (`stdout`) se torne a entrada do próximo (`stdin`)
 
 Por exemplo, para abrir um programa que lê sua entrada de `entrada.txt` e escreve em `resposta.txt` e reporta erros em `erros.txt`:

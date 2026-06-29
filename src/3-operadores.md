@@ -75,7 +75,7 @@ Os operadores aritméticos são utilizados para efetuar as quatro operações ma
 | `/`      | Divisão          |
 | `%`      | Resto da divisão |
 
-Acredito que os operadores aritméticos sejam bem intuitivos para quem já estudou matemática, mas na dúvida eis aqui um exemplo demonstrando todos:
+Acredito que os operadores aritméticos sejam bem intuitivos para quem já estudou matemática básica, o código abaixo exemplifica o uso de todos operadores aritméticos:
 ```c
     int soma, sub, mul, div, rest;
     int x = 10;
@@ -154,7 +154,7 @@ Portanto todos os operadores booleanos sempre resultam em 0 (`Falso`) ou 1 (`Ver
 | `&&`     | AND lógico       |
 | `⏐⏐`     | OR lógico        |
 
-A maioria dos operadores são auto explicativos ao considerarmos a descrição juntamente ao fato de que todos operadores só retornam `Verdadeiro` ou `Falso`.
+A maioria dos operadores são auto explicativos ao considerarmos a descrição juntamente ao fato de que todos operadores só retornam 1 (`Verdadeiro`) ou 0 (`Falso`).
 
 Com exceção, claro, dos três últimos operadores da tabela:
 
@@ -209,14 +209,117 @@ Assume-se ao menos um conhecimento acerca de números binários e que o leitor s
 | `<<`     | Deslocamento de bit para esquerda |
 | `>>`     | Deslocamento de bit para direita  |
 
-- `NOT bit a bit` : Realiza uma inversão de cada bit do valor individualmente.
-- `AND bit a bit` : Realiza uma operação similar ao `AND lógico` em cada bit, gerando um resultado onde apenas os bits em comuns que os dois valores compartilham estão ativos.
-- `OR bit a bit` : Realiza uma operação similar ao `OR lógico` em cada bit, gerando um resultado onde os bits estão ativos a não ser que ambos os valores não tenham aquele bit ativo.
-- `XOR bit a bit` : Traduzido, é um `OU Não Exclusivo`, seu papel é similar ao `OR lógico` porém se ambos os valores forem `Verdadeiros`, o resultado é `Falso`, porém o `XOR` em C não tem versão lógica, portanto ele é sempre bit a bit.
-- `Deslocamento de bit para esquerda`: Desloca os bits para esquerda, resultando geralmente, numa multiplicação por 2 elevado na `X`, sendo `X` o número do deslocamento (claro que para valores com sinal, isso muda pois podemos acabar gerando um número negativo ao alcançar o bit do sinal)
-- `Deslocamento de bit para direita`: Desloca os bits para direita, resultando geralmente, numa divisão por 2 elevado na `X`, sendo `X` o número do deslocamento.
+- `NOT bit a bit` : Inverte todos os bits do valor, de forma que todo bit `1` se torne `0` e todo bit `0` se torne `1`.
+- `AND bit a bit` : Realiza um `AND lógico` entre cada bit dos dois valores.
+- `OR bit a bit` : Realiza um `OR lógico` entre cada bit dos dois valores.
+- `XOR bit a bit` : Traduzido, é um `OU Não Exclusivo`, seu papel é similar ao `OR lógico` porém se ambos os valores forem `Verdadeiros`, o resultado é `Falso`. O `XOR` em C não tem versão lógica, portanto ele é sempre bit a bit.
+- `Deslocamento de bit para esquerda`: Desloca os bits do valor para esquerda, tendo efetivamente o efeito de: \\[X << Y = X \times 2^Y\\]
 
-Operações comuns utilizando os operadores bit a bit: 
+- `Deslocamento de bit para direita`: Desloca os bits do valor para direita, tendo efetivamente o efeito de: \\[X >> Y = \frac{X}{2^Y}\\]
+
+### Tabela verdade e exemplo
+Para as operações `NOT`, `AND`, `OR` e `XOR` podemos usar a tabela verdade, que é uma tabela que relaciona o resultado de acordo com as entradas.
+
+Onde `A` simboliza a primeira entrada, `B` a segunda e `S` o resultado.
+
+{{#tabs }}
+{{#tab name="NOT (~)"}}
+| A | S |
+| - | - |
+| 0 | 1 |
+| 1 | 0 |
+
+```c
+//Ao usar NOT, invertemos todos bits do valor, inclusive os que não escrevemos
+//Vamos considerar "int" como sendo 4 bytes e complemento de 2
+~0;          //Equivale a 0xFFFFFFFF ou -1
+~(-1);       //Equivale a 0
+~0x00FF00FF; //Equivale a 0xFF00FF00
+~5;          //Equivale a 0xFFFFFFFA
+```
+{{#endtab }}
+
+{{#tab name="AND (&)"}}
+
+| A | B | S |
+| - | - | - |
+| 0 | 0 | 0 | 
+| 0 | 1 | 0 |
+| 1 | 0 | 0 |
+| 1 | 1 | 1 |
+
+```c
+//Ao usar AND, estamos mantendo em 1 apenas os bits em que ambos valores são 1
+//Os comentários mostram os respectivos valores em binário
+11;     //1011
+7;      //0111
+11 & 7; //0011 = 3 
+
+4;     //0100
+8;     //1000
+4 & 8; //0000 = 0 
+```
+{{#endtab }}
+
+{{#tab name="OR (|)"}}
+| A | B | S |
+| - | - | - |
+| 0 | 0 | 0 | 
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 1 |
+
+```c
+//Ao usar OR, estamos mantendo em 1 os bits em que qualquer um dos valores é 1
+//Os comentários mostram os respectivos valores em binário
+4;     //0100 
+8;     //1000
+4 | 8; //1100 = 12
+
+12;     //1100
+7;      //0111
+12 | 7; //1111 = 15
+```
+{{#endtab}}
+
+{{#tab name="XOR (^)"}}
+| A | B | S |
+| - | - | - |
+| 0 | 0 | 0 | 
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+```c
+//Ao usar XOR, estamos trocando os bits de um valor baseado nos bits 1 do outro
+6;      //0110
+15;     //1111
+15 ^ 6; //1001 = 9
+
+4;  //0100
+8;  //1000
+12; //1100 = 12
+
+//XOR também é usado para realizar criptografias muito primitivas, devido as 
+//propriedades:
+//X ^ X = 0
+//X ^ 0 = X 
+//X ^ Y ^ Y = X
+//Devido a essas propriedades, toda operação XOR realizada um número par 
+//de vezes se anula
+
+//A lógica de uma criptografia com XOR é simples:
+char chave = 'X';
+int valor = 1;
+int criptografado    = valor ^ chave;
+int descriptografado = criptografado ^ chave;
+```
+{{#endtab}}
+
+{{#endtabs }}
+
+### Operações comuns com valores bit a bit
+
 ```c
     //Conseguir o valor que equivale ao bit Nº X (começando por bit 0)
     bit = 1 << X;
@@ -251,7 +354,7 @@ A linguagem C também apresenta alguns operadores adicionais que não se encaixa
 | `typeof_unqual` | Tipo sem modificadores de (`C23`) |
 
 ### Chamada de função 
- Ao chamar uma [função](./7-funcoes.md) , utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variável guardando o endereço de uma função).
+Ao chamar uma [função](./7-funcoes.md), utilizamos o operador `()`, preenchido com uma lista separada por virgulas de zero ou mais argumentos, toda chamada de função é precedida de uma expressão que resulta num ponteiro de função (seja o nome direto da função, ou uma variável guardando o endereço de uma função).
 
 ### Operador virgula
 Este operador é utilizado para adicionar uma expressão adicional, ignorando o resultado da expressão anterior, mas ainda levando em consideração os seus efeitos colaterais. Por exemplo ao escrevermos `a,b`, os efeitos colaterais de `a` são aplicados, porém, o resultado da expressão como um todo será o resultado de `b`.
@@ -283,6 +386,7 @@ Este operador é utilizado para converter um tipo para outro, algumas conversõe
 
 ```c
     #include <inttypes.h>
+    #include <dlfcn.h> //Só existe em sistemas UNIX, usada para definição dlsym
 
     //Ignorando retorno
     (void)printf("Teste...\n");
@@ -336,7 +440,7 @@ Exemplos:
 ### Operador sizeof
 O operador `sizeof` pode ser usado para obter o tamanho de qualquer tipo, variável ou valor, diretamente em bytes.
 
-No geral mesmo quando um valor é passado ao `sizeof`, o valor não é realmente avaliado e sim o tamanho que o tipo daquele valor teria, portanto expressões que ocasionariam em erros ou crashs no programa ao serem avaliadas, não o causam, pois não são realmente avaliadas. 
+No geral mesmo quando um valor é passado ao `sizeof`, o valor não é realmente avaliado e sim o tamanho que o tipo daquele valor teria, portanto expressões que ocasionariam em erros ou crashs no programa ao serem avaliadas, não o causam, pois não são realmente avaliadas.
 
 Na maioria dos casos, com exceção de arrays de tamanho variável, o operador `sizeof` é avaliado durante a compilação, portanto seu uso não afeta o tempo de execução (nesses casos ele é efetivamente uma constante), o tipo do valor resultante do `sizeof` é sempre do mesmo tipo de `size_t`.
 

@@ -275,6 +275,15 @@ O padrão de cada tipo é :
 
 O modificador `auto` é considerado inútil, pois só pode ser aplicado a variáveis locais e já é o comportamento padrão para elas.
 
+Porém no `C23` ele assumiu uma segunda função, a inferência de tipo, onde o tipo da variavel é deduzido baseado na expressão usada para inicializá-la.
+
+```c
+auto a = 5;       //a é "int"
+auto b = "Texto"; //b é "const char*"
+auto c = 1.0f;    //c é "float"
+auto d[] = {1,2}; //d causa um erro, não podemos ter um array de "auto"
+```
+
 ### register
 
 O modificador `register` é utilizado para indicar que uma variável deve ser diretamente guardada apenas em registrador, isto é, nas "mãos" do processador, utilizadas para operar com valores, e portanto, o endereço da variável não pode ser acessado.

@@ -26,7 +26,7 @@ Com isso é possível montar a tabela abaixo (relacionando a quantidade de bits 
 | ----------- | -------------- | :--: | :---: | :---: | :--: |
 | `char`      | Pelo menos 8   |  8   |   8   |   8   |   8  |
 | `short`     | Pelo menos 16  |  16  |   16  |  16   |  16  |
-| `int`       | Pelo menos 16  |  16  |   16  |  32   |  32  |
+| `int`       | Pelo menos 16  |  16  |   32  |  32   |  32  |
 | `long`      | Pelo menos 32  |  32  |   32  |  32   |  64  |
 | `long long` | Pelo menos 64  |  64  |   64  |  64   |  64  |
 
